@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 🚀 Space Invader - Pygame
 
 A retro-style **Space Invader game** built using **Python and Pygame**, featuring:
@@ -129,6 +128,3 @@ Open a terminal or command prompt, navigate to the folder where your game files 
 
 Made with ❤️ by [Aditya Singh](https://github.com/adityas-28)**
 =======
-# Modern_Space_Invader
-A classic Space Invader game with a modern touch,  built with Python and Pygame. Features multiple enemy types, boss fights, score tracking, health system, and sound effects. Fun, retro-style arcade shooter – fully playable and customizable!
->>>>>>> 57c7f2425915d84b22a270c1c7da0b411968008c
