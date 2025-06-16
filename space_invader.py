@@ -310,6 +310,8 @@ isWon = False
 PLAYER_SPEED = 8
 BULLET_SPEED = 12
 
+isPaused = False
+
 while running:
     clock.tick(60)
     if not isGameOver:
@@ -318,6 +320,26 @@ while running:
             isGameOver = True
         screen.fill((14, 8, 22))  # RGB
         screen.blit(background, (0, 0))
+
+        if isPaused:
+            pause_font = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 50)
+            pause_text = pause_font.render("Paused", True, (255, 255, 255))
+            screen.blit(pause_text, (screen.get_width() // 2 - pause_text.get_width() // 2, screen.get_height() // 2 - pause_text.get_height() // 2))
+            pygame.display.update()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_p: 
+                        isPaused = not isPaused
+                    elif event.key == pygame.K_m:
+                        toggle_mute()
+                    elif event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        exit()
+            continue
+
+
 
         drawBunkers()
 
@@ -333,10 +355,7 @@ while running:
                 if event.key == pygame.K_m:
                     toggle_mute()
                 if event.key == pygame.K_p: 
-                    if pygame.mixer.music.get_busy():
-                        pygame.mixer.music.pause()
-                    else:
-                        pygame.mixer.music.unpause()
+                    isPaused = not isPaused
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     exit()

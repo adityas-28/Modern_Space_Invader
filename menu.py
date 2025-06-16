@@ -40,8 +40,6 @@ def toggle_mute():
 #                 exit()
                 
 
-
-
 def main_menu():
     while True:
         screen.blit(background, (0, 0))
