@@ -229,24 +229,25 @@ def show_score(x, y):
 
 
 def showHealth(x, y):
-    health = font.render("Health ", True, (166, 134, 240))
-    screen.blit(health, (x - 2, y))
+    health = font.render("Health ", True, (250, 22, 22))
+    screen.blit(health, (x + 8, y))
     totalHearts = 3
     for i in range(totalHearts):
         screen.blit(aliveHeartImage, (x + 30 * i, y + 25))
     for i in range(3 - noOfLives):
         screen.blit(deadHeartImage, (x + 30 * (totalHearts - i - 1), y + 25))
 
-def gameOver(ifWon):
+def gameOver(ifWon, kills, timeTaken, livesLeft):
     screen.fill((0, 0, 0))
     screen.blit(gameOverBackground, (0, 0))
 
     end_time = pygame.time.get_ticks()
-    elapsed_time = (end_time - start_time) / 1000
 
-    score_value = int(100*(1 - elapsed_time / 120))
-    if ifWon:
-        score_value += 100
+    if not ifWon:
+        timeTaken = 0
+        livesLeft = 0
+
+    score_value = int(livesLeft * 50 + kills * 5 + timeTaken * 2)
 
     over_font = pygame.font.Font(r'resources/fonts/SPACEBOY.TTF', 60)
     small_font = pygame.font.Font(r'resources/fonts/SPACEBOY.TTF', 30)
@@ -367,16 +368,24 @@ BULLET_SPEED = 12
 isPaused = False
 sfx_enabled = True
 music_enabled = True
+start_timer = pygame.time.get_ticks()
+maxTimeLimit = 120 
 
 while running:
     clock.tick(60)
-    start_time = pygame.time.get_ticks()
     if not isGameOver:
         if allEnemiesDead():
             isWon = True
             isGameOver = True
         screen.fill((14, 8, 22))  # RGB
         screen.blit(background, (0, 0))
+
+        current_time = pygame.time.get_ticks()
+        elapsed_time = (current_time - start_timer) // 1000  
+
+        font = pygame.font.Font(None, 36)
+        timer_text = font.render(f"Time Left: {maxTimeLimit - elapsed_time}", True, (166, 134, 240))
+        screen.blit(timer_text, (10, 40))
 
         if isPaused:
             pause_font = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 50)
@@ -560,7 +569,8 @@ while running:
                     pygame.quit()
                     exit()
 
-        restart = gameOver(True if isWon else False)
+    
+        restart = gameOver(True if isWon else False, score_value, maxTimeLimit - elapsed_time, noOfLives)
         if restart:
             isGameOver = False
             running = True
@@ -574,6 +584,7 @@ while running:
             bulletX = 0
             bulletY = 0
             enemy_bullets.clear()
+            start_timer = pygame.time.get_ticks()
 
             for enemy in enemyInfo:
                 enemy['lives'] = 1
