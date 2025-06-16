@@ -39,7 +39,6 @@ playerImage = pygame.image.load(r'resources\images\spaceship (1).png')
 playerImage = pygame.transform.scale(playerImage, (55, 55))
 playerX = 375
 playerY = 500
-
 playerX_change = 0
 playerY_change = 0
 
