@@ -228,6 +228,20 @@ def show_score(x, y):
     screen.blit(score, (x, y))
 
 
+def load_high_score():
+    try:
+        with open("highscore.txt", "r") as file:
+            return int(file.read().strip())
+    except (FileNotFoundError, ValueError):
+        return 0
+
+def save_high_score(new_high_score):
+    with open("highscore.txt", "w") as file:
+        file.write(str(new_high_score))
+
+high_score = load_high_score()
+
+
 def showHealth(x, y):
     health = font.render("Health ", True, (250, 22, 22))
     screen.blit(health, (x + 8, y))
@@ -248,6 +262,10 @@ def gameOver(ifWon, kills, timeTaken, livesLeft):
         livesLeft = 0
 
     score_value = int(livesLeft * 50 + kills * 5 + timeTaken * 2)
+    global high_score
+    if score_value > high_score:
+        high_score = score_value
+        save_high_score(high_score)
 
     over_font = pygame.font.Font(r'resources/fonts/SPACEBOY.TTF', 60)
     small_font = pygame.font.Font(r'resources/fonts/SPACEBOY.TTF', 30)
@@ -255,6 +273,8 @@ def gameOver(ifWon, kills, timeTaken, livesLeft):
     game_over_text = over_font.render("GAME OVER", True, (176, 140, 255))
     win_or_lose_text = over_font.render("You Win!" if ifWon else "You Lost!", True, (176, 140, 255))
     score_text = small_font.render(f"Final Score: {score_value}", True, (255, 255, 255))
+    high_score_text = small_font.render(f"High Score: {high_score}", True, (255, 255, 255))
+
 
     button_font = pygame.font.Font(r'resources/fonts/SPACEBAR.TTF', 15)
     play_again_text = button_font.render("Play Again", True, (0, 0, 0))
@@ -286,7 +306,9 @@ def gameOver(ifWon, kills, timeTaken, livesLeft):
         screen.blit(gameOverBackground, (0, 0))
         screen.blit(game_over_text, (screen.get_width() // 2 - game_over_text.get_width() // 2, 150))
         screen.blit(win_or_lose_text, (screen.get_width() // 2 - win_or_lose_text.get_width() // 2, 235))
-        screen.blit(score_text, (screen.get_width() // 2 - score_text.get_width() // 2, 325))
+        screen.blit(score_text, (screen.get_width() // 2 - score_text.get_width() // 2, 330))
+        screen.blit(high_score_text, (screen.get_width() // 2 - high_score_text.get_width() // 2, 380))
+
 
         mouse_pos = pygame.mouse.get_pos()
         pygame.draw.rect(screen, (120, 227, 235) if play_again_rect.collidepoint(mouse_pos) else (140, 247, 255), play_again_rect)
