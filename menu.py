@@ -16,12 +16,27 @@ pygame.mixer.music.set_volume(0.3)  #
 pygame.mixer.music.play(-1)  
 
 isPaused = False
+isPlaying = True
 
 def toggle_mute():
     if pygame.mixer.music.get_busy():
         pygame.mixer.music.pause()
+        isPlaying = False
     else:
         pygame.mixer.music.unpause()
+        isPlaying = True
+
+# def pause_music():
+#     global isPlaying
+#     if isPlaying:
+#         pygame.mixer.music.pause()
+#         isPlaying = False
+
+# def unpause_music():
+#     global isPlaying
+#     if not isPlaying:
+#         pygame.mixer.music.unpause()
+#         isPlaying = True
 
 def main_menu():
     while True:
@@ -31,7 +46,7 @@ def main_menu():
             pause_font = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 50)
             pause_text = pause_font.render("Paused", True, (133, 255, 253))
             pause_font_inner = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 25)
-            pause_text_inner = pause_font_inner.render("Pree P to Unpause", True, (255, 255, 255))
+            pause_text_inner = pause_font_inner.render("Press P to Unpause", True, (255, 255, 255))
             
             screen.blit(pause_text, (screen.get_width() // 2 - pause_text.get_width() // 2, screen.get_height() // 2 - pause_text.get_height() // 2))
             screen.blit(pause_text_inner, (screen.get_width() // 2 - pause_text_inner.get_width() // 2, screen.get_height() // 2 + pause_text.get_height() // 2 + 15))
@@ -44,9 +59,16 @@ def main_menu():
 
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_p: 
+                        pausesound = pygame.mixer.Sound(r'resources/sounds/pause.wav').play()
                         isPaused = not isPaused
+                        # if isPlaying:
+                        #     pause_music()
+                        # else:
+                        #     unpause_music()
+
                     elif event.key == pygame.K_m:
                         toggle_mute()
+
                     elif event.key == pygame.K_ESCAPE:
                         pygame.quit()
                         exit()
@@ -90,10 +112,15 @@ def main_menu():
                 exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_m:
-                    toggle_mute()
+                    if isPlaying:
+                        toggle_mute()
                 if event.key == pygame.K_p: 
-                    # global isPaused
-                    isPaused = not isPaused
+                        pausesound = pygame.mixer.Sound(r'resources/sounds/pause.wav').play()
+                        isPaused = not isPaused
+                        # if isPlaying:
+                        #     pause_music()
+                        # else:
+                        #     unpause_music()
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     exit()

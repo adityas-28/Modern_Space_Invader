@@ -269,11 +269,11 @@ def gameOver(ifWon, kills, timeTaken, livesLeft):
     sound_played_time = None
     isPaused = False
 
-    if music_enabled:
-        if pygame.mixer.music.get_busy():
-            pygame.mixer.music.stop()
-        # Uncomment the next line if you want to pause the music instead of stopping it
-    pygame.mixer.music.pause()
+    # if music_enabled:
+    #     if pygame.mixer.music.get_busy():
+    #         pygame.mixer.music.stop()
+        
+    # pygame.mixer.music.pause()
 
     if sfx_enabled:
         sound_path = r'resources/sounds/gameWinBGM.mp3' if ifWon else r'resources/sounds/gameOverBGM.mp3'
@@ -310,6 +310,10 @@ def gameOver(ifWon, kills, timeTaken, livesLeft):
                     if not sfx_enabled and game_over_sound:
                         game_over_sound.stop()
 
+                elif event.key == pygame.K_RETURN:
+                    pygame.mixer.music.unpause()
+                    return True
+
                 elif event.key == pygame.K_p:
                     isPaused = True
                     while isPaused:
@@ -328,12 +332,17 @@ def gameOver(ifWon, kills, timeTaken, livesLeft):
                                 exit()
                             elif pause_event.type == pygame.KEYDOWN:
                                 if pause_event.key == pygame.K_p:
+                                    pausesound = mixer.Sound(r'resources/sounds/pause.wav').play()
                                     isPaused = False
+                                    # toggle_mute()
                                 elif pause_event.key == pygame.K_m:
                                     toggle_mute()
                                 elif pause_event.key == pygame.K_ESCAPE:
                                     pygame.quit()
                                     exit()
+                                elif event.key == pygame.K_RETURN:
+                                    pygame.mixer.music.unpause()
+                                    return True
 
                 elif event.key == pygame.K_ESCAPE:
                     pygame.quit()
@@ -370,6 +379,8 @@ sfx_enabled = True
 music_enabled = True
 start_timer = pygame.time.get_ticks()
 maxTimeLimit = 120 
+pause_time = 0
+pause_start_time = None
 
 while running:
     clock.tick(60)
@@ -380,18 +391,15 @@ while running:
         screen.fill((14, 8, 22))  # RGB
         screen.blit(background, (0, 0))
 
-        current_time = pygame.time.get_ticks()
-        elapsed_time = (current_time - start_timer) // 1000  
-
-        font = pygame.font.Font(None, 36)
-        timer_text = font.render(f"Time Left: {maxTimeLimit - elapsed_time}", True, (166, 134, 240))
-        screen.blit(timer_text, (10, 40))
-
         if isPaused:
+            if pause_start_time is None:
+                pause_start_time = pygame.time.get_ticks()
+            # pause_time += pygame.time.get_ticks() - pause_start_time
+            # pause_start_time = pygame.time.get_ticks()
             pause_font = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 50)
             pause_text = pause_font.render("Paused", True, (133, 255, 253))
             pause_font_inner = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 25)
-            pause_text_inner = pause_font_inner.render("Pree P to Unpause", True, (255, 255, 255))
+            pause_text_inner = pause_font_inner.render("Press P to Unpause", True, (255, 255, 255))
             
             screen.blit(pause_text, (screen.get_width() // 2 - pause_text.get_width() // 2, screen.get_height() // 2 - pause_text.get_height() // 2))
             screen.blit(pause_text_inner, (screen.get_width() // 2 - pause_text_inner.get_width() // 2, screen.get_height() // 2 + pause_text.get_height() // 2 + 15))
@@ -403,7 +411,12 @@ while running:
 
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_p: 
+                        pausesound = mixer.Sound(r'resources/sounds/pause.wav').play()
                         isPaused = not isPaused
+                        if pause_start_time is not None:
+                            pause_time += pygame.time.get_ticks() - pause_start_time
+                        pause_start_time = None
+
                     elif event.key == pygame.K_m:
                         toggle_mute()
                     elif event.key == pygame.K_ESCAPE:
@@ -418,6 +431,17 @@ while running:
 
         player_bullets = []
 
+        current_time = pygame.time.get_ticks()
+        elapsed_time = (current_time - start_timer - pause_time) // 1000  
+
+        font = pygame.font.Font(None, 36)
+        timer_text = font.render(f"Time Left: {maxTimeLimit - elapsed_time}", True, (166, 134, 240))
+        screen.blit(timer_text, (10, 40))
+
+        if maxTimeLimit - elapsed_time <= 0:
+            isGameOver = True
+            isWon = False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -427,6 +451,8 @@ while running:
                     toggle_mute()
                 if event.key == pygame.K_p: 
                     isPaused = not isPaused
+                    pausesound = mixer.Sound(r'resources/sounds/pause.wav').play()
+                    # toggle_mute()
                 if event.key == pygame.K_s:
                     sfx_enabled = not sfx_enabled
                 if event.key == pygame.K_ESCAPE:
