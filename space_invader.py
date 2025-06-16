@@ -65,6 +65,12 @@ enemy3Image = pygame.transform.scale(enemy3Image, (50, 50))
 enemy4Image = pygame.image.load(r'resources\images\ufo.png')
 enemy4Image = pygame.transform.scale(enemy4Image, (50, 50))
 
+def toggle_mute():
+    if pygame.mixer.music.get_busy():
+        pygame.mixer.music.pause()
+    else:
+        pygame.mixer.music.unpause()
+
 
 def player(x, y):
     screen.blit(playerImage, (x, y))
@@ -95,6 +101,31 @@ def fire_bullet(x, y):
 def enemy_fire_bullet(x, y):
     enemy_bullets.append({'x': x, 'y': y})
 
+
+def drawBunkers():
+    for bunker in bunkerInfo:
+        if bunker['health'] <= 0:
+            continue
+        if bunker['health'] == 3:
+            bunker1(bunker['x'], bunker['y'])
+        elif bunker['health'] == 2:
+            bunker2(bunker['x'], bunker['y'])
+        elif bunker['health'] == 1:
+            bunker3(bunker['x'], bunker['y'])
+
+def drawEnemies():
+    for enemy in enemyInfo:
+        if enemy['alive']:
+            if enemy['type'] == 1:
+                enemy1(enemy['x'], enemy['y'])
+            elif enemy['type'] == 2:
+                enemy2(enemy['x'], enemy['y'])
+            elif enemy['type'] == 3:
+                enemy3(enemy['x'], enemy['y'])
+            elif enemy['type'] == 4:
+                enemy4(enemy['x'], enemy['y'])
+                health_text = font.render(f"Boss HP: {enemy['lives']}", True, (255, 0, 0))
+                screen.blit(health_text, (645, 80))
 
 enemyPos = [
     [0, 0, 1, 3, 1, 0, 0],
@@ -288,28 +319,9 @@ while running:
         screen.fill((14, 8, 22))  # RGB
         screen.blit(background, (0, 0))
 
-        for bunker in bunkerInfo:
-            if bunker['health'] <= 0:
-                continue
-            if bunker['health'] == 3:
-                bunker1(bunker['x'], bunker['y'])
-            elif bunker['health'] == 2:
-                bunker2(bunker['x'], bunker['y'])
-            elif bunker['health'] == 1:
-                bunker3(bunker['x'], bunker['y'])
+        drawBunkers()
 
-        for enemy in enemyInfo:
-            if enemy['alive']:
-                if enemy['type'] == 1:
-                    enemy1(enemy['x'], enemy['y'])
-                elif enemy['type'] == 2:
-                    enemy2(enemy['x'], enemy['y'])
-                elif enemy['type'] == 3:
-                    enemy3(enemy['x'], enemy['y'])
-                elif enemy['type'] == 4:
-                    enemy4(enemy['x'], enemy['y'])
-                    health_text = font.render(f"Boss HP: {enemy['lives']}", True, (255, 0, 0))
-                    screen.blit(health_text, (645, 80))
+        drawEnemies()
 
         player_bullets = []
 
@@ -318,6 +330,16 @@ while running:
                 running = False
 
             elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+                    toggle_mute()
+                if event.key == pygame.K_p: 
+                    if pygame.mixer.music.get_busy():
+                        pygame.mixer.music.pause()
+                    else:
+                        pygame.mixer.music.unpause()
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    exit()
                 if event.key == pygame.K_LEFT:
                     playerX_change -= PLAYER_SPEED
                 elif event.key == pygame.K_RIGHT:
@@ -408,7 +430,8 @@ while running:
                         if j not in EnemyColStillAlive:
                             EnemyColStillAlive.append(j)
 
-            colSelected = random.choice(EnemyColStillAlive)
+            if EnemyColStillAlive:
+                colSelected = random.choice(EnemyColStillAlive)
             enemyFiring = []
 
             for i in range(len(enemyAliveLocations) - 1, -1, -1):
@@ -431,6 +454,22 @@ while running:
         pygame.display.update()
 
     else:
+        # for event in pygame.event.get():
+        #     if event.type == pygame.QUIT:
+        #         pygame.quit()
+        #         exit()
+        #     if event.type == pygame.KEYDOWN:
+        #         if event.key == pygame.K_m:
+        #             toggle_mute()
+        #         if event.key == pygame.K_p: 
+        #             if pygame.mixer.music.get_busy():
+        #                 pygame.mixer.music.pause()
+        #             else:
+        #                 pygame.mixer.music.unpause()
+        #         if event.key == pygame.K_ESCAPE:
+        #             pygame.quit()
+        #             exit()
+
         restart = gameOver(True if isWon else False)
         if restart:
             isGameOver = False
