@@ -234,66 +234,105 @@ def showHealth(x, y):
     for i in range(3 - noOfLives):
         screen.blit(deadHeartImage, (x + 30 * (totalHearts - i - 1), y + 25))
 
-
 def gameOver(ifWon):
     screen.fill((0, 0, 0))
     screen.blit(gameOverBackground, (0, 0))
 
-    over_font = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 60)
-    small_font = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 30)
+    over_font = pygame.font.Font(r'resources/fonts/SPACEBOY.TTF', 60)
+    small_font = pygame.font.Font(r'resources/fonts/SPACEBOY.TTF', 30)
 
     game_over_text = over_font.render("GAME OVER", True, (176, 140, 255))
-    win_or_lose_text = over_font.render("You Win !" if ifWon else "You Lost !", True, (176, 140, 255))
+    win_or_lose_text = over_font.render("You Win!" if ifWon else "You Lost!", True, (176, 140, 255))
     score_text = small_font.render(f"Final Score: {score_value}", True, (255, 255, 255))
 
-    screen.blit(game_over_text, (screen.get_width() // 2 - game_over_text.get_width() // 2, 150))
-    screen.blit(win_or_lose_text, (screen.get_width() // 2 - win_or_lose_text.get_width() // 2, 235))
-    screen.blit(score_text, (screen.get_width() // 2 - score_text.get_width() // 2, 325))
-
-    button_font = pygame.font.Font(r'resources\fonts\SPACEBAR.TTF', 15)
+    button_font = pygame.font.Font(r'resources/fonts/SPACEBAR.TTF', 15)
     play_again_text = button_font.render("Play Again", True, (0, 0, 0))
     quit_text = button_font.render("Quit", True, (0, 0, 0))
 
     play_again_rect = pygame.Rect(screen.get_width() // 2 - 150, 450, 140, 50)
     quit_rect = pygame.Rect(screen.get_width() // 2 + 10, 450, 100, 50)
 
-    mouse_pos = pygame.mouse.get_pos()
-    pygame.draw.rect(screen, (120, 227, 235) if play_again_rect.collidepoint(mouse_pos) else (140, 247, 255),
-                     play_again_rect)
-    pygame.draw.rect(screen, (235, 80, 80) if quit_rect.collidepoint(mouse_pos) else (255, 100, 100), quit_rect)
+    # pygame.mixer.music.pause()
 
-    screen.blit(play_again_text, (play_again_rect.x + 5, play_again_rect.y + 15))
-    screen.blit(quit_text, (quit_rect.x + 25, quit_rect.y + 15))
+    global sfx_enabled
+    game_over_sound = None
+    sound_played_time = None
+    isPaused = False
 
-    pygame.display.update()
-
-    pygame.mixer.music.pause()
-
-    if ifWon:
-        game_over_sound = mixer.Sound(r'resources\sounds\gameWinBGM.mp3')
-    else:
-        game_over_sound = mixer.Sound(r'resources\sounds\gameOverBGM.mp3')
-
-    game_over_sound.play()
-    time.sleep(game_over_sound.get_length())
-
-    pygame.mixer.music.unpause()
+    if sfx_enabled:
+        sound_path = r'resources/sounds/gameWinBGM.mp3' if ifWon else r'resources/sounds/gameOverBGM.mp3'
+        game_over_sound = mixer.Sound(sound_path)
+        game_over_sound.play()
+        sound_played_time = pygame.time.get_ticks()
 
     waiting = True
     while waiting:
+        screen.blit(gameOverBackground, (0, 0))
+        screen.blit(game_over_text, (screen.get_width() // 2 - game_over_text.get_width() // 2, 150))
+        screen.blit(win_or_lose_text, (screen.get_width() // 2 - win_or_lose_text.get_width() // 2, 235))
+        screen.blit(score_text, (screen.get_width() // 2 - score_text.get_width() // 2, 325))
+
+        mouse_pos = pygame.mouse.get_pos()
+        pygame.draw.rect(screen, (120, 227, 235) if play_again_rect.collidepoint(mouse_pos) else (140, 247, 255), play_again_rect)
+        pygame.draw.rect(screen, (235, 80, 80) if quit_rect.collidepoint(mouse_pos) else (255, 100, 100), quit_rect)
+        screen.blit(play_again_text, (play_again_rect.x + 5, play_again_rect.y + 15))
+        screen.blit(quit_text, (quit_rect.x + 25, quit_rect.y + 15))
+
+        pygame.display.update()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+                    toggle_mute()
+
+                elif event.key == pygame.K_s:
+                    sfx_enabled = not sfx_enabled
+                    if not sfx_enabled and game_over_sound:
+                        game_over_sound.stop()
+
+                elif event.key == pygame.K_p:
+                    isPaused = True
+                    while isPaused:
+                        screen.blit(gameOverBackground, (0, 0))
+                        pause_font = pygame.font.Font(r'resources/fonts/SPACEBOY.TTF', 50)
+                        pause_text = pause_font.render("Paused", True, (133, 255, 253))
+                        inner_font = pygame.font.Font(r'resources/fonts/SPACEBOY.TTF', 25)
+                        inner_text = inner_font.render("Press P to Unpause", True, (255, 255, 255))
+                        screen.blit(pause_text, (screen.get_width() // 2 - pause_text.get_width() // 2, 250))
+                        screen.blit(inner_text, (screen.get_width() // 2 - inner_text.get_width() // 2, 325))
+                        pygame.display.update()
+
+                        for pause_event in pygame.event.get():
+                            if pause_event.type == pygame.QUIT:
+                                pygame.quit()
+                                exit()
+                            elif pause_event.type == pygame.KEYDOWN:
+                                if pause_event.key == pygame.K_p:
+                                    isPaused = False
+                                elif pause_event.key == pygame.K_m:
+                                    toggle_mute()
+                                elif pause_event.key == pygame.K_ESCAPE:
+                                    pygame.quit()
+                                    exit()
+
+                elif event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    exit()
+
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
                 if play_again_rect.collidepoint(mouse_pos):
-                    waiting = False
+                    pygame.mixer.music.unpause()
                     return True
                 elif quit_rect.collidepoint(mouse_pos):
                     pygame.quit()
                     return False
-                    exit()
+
+        if sound_played_time and pygame.time.get_ticks() - sound_played_time >= game_over_sound.get_length() * 1000:
+            sound_played_time = None
 
 
 def allEnemiesDead():
@@ -311,6 +350,7 @@ PLAYER_SPEED = 8
 BULLET_SPEED = 12
 
 isPaused = False
+sfx_enabled = True
 
 while running:
     clock.tick(60)
@@ -323,12 +363,18 @@ while running:
 
         if isPaused:
             pause_font = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 50)
-            pause_text = pause_font.render("Paused", True, (255, 255, 255))
+            pause_text = pause_font.render("Paused", True, (133, 255, 253))
+            pause_font_inner = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 25)
+            pause_text_inner = pause_font_inner.render("Pree P to Unpause", True, (255, 255, 255))
+            
             screen.blit(pause_text, (screen.get_width() // 2 - pause_text.get_width() // 2, screen.get_height() // 2 - pause_text.get_height() // 2))
+            screen.blit(pause_text_inner, (screen.get_width() // 2 - pause_text_inner.get_width() // 2, screen.get_height() // 2 + pause_text.get_height() // 2 + 15))
+
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_p: 
                         isPaused = not isPaused
@@ -338,7 +384,6 @@ while running:
                         pygame.quit()
                         exit()
             continue
-
 
 
         drawBunkers()
@@ -356,6 +401,8 @@ while running:
                     toggle_mute()
                 if event.key == pygame.K_p: 
                     isPaused = not isPaused
+                if event.key == pygame.K_s:
+                    sfx_enabled = not sfx_enabled
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     exit()
@@ -369,7 +416,8 @@ while running:
                     playerY_change += PLAYER_SPEED
                 if event.key == pygame.K_SPACE:
                     if not bullet_state:
-                        mixer.Sound(r'resources\sounds\laser2.wav').play()
+                        if sfx_enabled:
+                            mixer.Sound(r'resources\sounds\laser2.wav').play()
                         player_bullets.append({'x': playerX, 'y': playerY})
                         bulletX = playerX
                         bulletY = playerY
@@ -402,7 +450,8 @@ while running:
 
             hit_bunker = isBunkerHit(bulletX, bulletY)
             if hit_bunker:
-                mixer.Sound(r'resources\sounds\explosion.wav').play()
+                if sfx_enabled:
+                    mixer.Sound(r'resources\sounds\explosion.wav').play()
                 hit_bunker['health'] -= 1
                 bullet_state = False
                 bulletX = playerX
@@ -411,7 +460,8 @@ while running:
 
             hit_enemy = isCollision(bulletX, bulletY)
             if hit_enemy:
-                mixer.Sound(r'resources\sounds\explosionEnemy.mp3').play()
+                if sfx_enabled:
+                    mixer.Sound(r'resources\sounds\explosionEnemy.mp3').play()
                 hit_enemy['lives'] -= 1
                 if hit_enemy['lives'] == 0:
                     hit_enemy['alive'] = False
@@ -427,12 +477,14 @@ while running:
 
             hit_bunker = isBunkerHit(bullet['x'], bullet['y'])
             if hit_bunker:
-                mixer.Sound(r'resources\sounds\explosion.wav').play()
+                if sfx_enabled:
+                    mixer.Sound(r'resources\sounds\explosion.wav').play()
                 hit_bunker['health'] -= 1
                 enemy_bullets.remove(bullet)
 
             if isPlayerHit(bullet['x'], bullet['y'], playerX - 20, playerY + 10):
-                mixer.Sound(r'resources\sounds\explosionWarning.mp3').play()
+                if sfx_enabled:
+                    mixer.Sound(r'resources\sounds\explosionWarning.mp3').play()
                 noOfLives -= 1
                 enemy_bullets.remove(bullet)
                 if noOfLives == 0:
@@ -473,21 +525,23 @@ while running:
         pygame.display.update()
 
     else:
-        # for event in pygame.event.get():
-        #     if event.type == pygame.QUIT:
-        #         pygame.quit()
-        #         exit()
-        #     if event.type == pygame.KEYDOWN:
-        #         if event.key == pygame.K_m:
-        #             toggle_mute()
-        #         if event.key == pygame.K_p: 
-        #             if pygame.mixer.music.get_busy():
-        #                 pygame.mixer.music.pause()
-        #             else:
-        #                 pygame.mixer.music.unpause()
-        #         if event.key == pygame.K_ESCAPE:
-        #             pygame.quit()
-        #             exit()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+                    toggle_mute()
+                if event.key == pygame.K_p: 
+                    if pygame.mixer.music.get_busy():
+                        pygame.mixer.music.pause()
+                    else:
+                        pygame.mixer.music.unpause()
+                if event.key == pygame.K_s: 
+                    sfx_enabled = not sfx_enabled
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    exit()
 
         restart = gameOver(True if isWon else False)
         if restart:

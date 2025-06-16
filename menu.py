@@ -2,46 +2,56 @@ import pygame
 
 pygame.init()
 
-# Create the screen
 screen = pygame.display.set_mode((800, 600))
-# Title and Icon
+
 pygame.display.set_caption("Space Invaders")
 icon = pygame.image.load(r'resources/images/spaceship.png')
 pygame.display.set_icon(icon)
-# Background
+
 background = pygame.image.load(r'resources/images/menuBG.jpg')
 background = pygame.transform.scale(background, (800, 600))
-# Music
+
 pygame.mixer.music.load(r'resources/sounds/strangerThingdBGMTrim.mp3')
-pygame.mixer.music.set_volume(0.5)  # Set volume to 50%
-pygame.mixer.music.play(-1)  # Play the music indefinitely
-# Mute functionality    
+pygame.mixer.music.set_volume(0.3)  #
+pygame.mixer.music.play(-1)  
+
+isPaused = False
+
 def toggle_mute():
     if pygame.mixer.music.get_busy():
         pygame.mixer.music.pause()
     else:
         pygame.mixer.music.unpause()
-# # Event handler for key presses
-# def handle_key_events():
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             pygame.quit()
-#             exit()
-#         if event.type == pygame.KEYDOWN:
-#             if event.key == pygame.K_m:  # M key to toggle mute
-#                 toggle_mute()
-#             if event.key == pygame.K_p:  # P key to pause
-#                 if pygame.mixer.music.get_busy():
-#                     pygame.mixer.music.pause()
-#                 else:
-#                     pygame.mixer.music.unpause()
-#             if event.key == pygame.K_ESCAPE:
-#                 pygame.quit()
-#                 exit()
-                
 
 def main_menu():
     while True:
+        global isPaused
+        if isPaused:
+            screen.blit(background, (0, 0))
+            pause_font = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 50)
+            pause_text = pause_font.render("Paused", True, (133, 255, 253))
+            pause_font_inner = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 25)
+            pause_text_inner = pause_font_inner.render("Pree P to Unpause", True, (255, 255, 255))
+            
+            screen.blit(pause_text, (screen.get_width() // 2 - pause_text.get_width() // 2, screen.get_height() // 2 - pause_text.get_height() // 2))
+            screen.blit(pause_text_inner, (screen.get_width() // 2 - pause_text_inner.get_width() // 2, screen.get_height() // 2 + pause_text.get_height() // 2 + 15))
+            pygame.display.update()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    pygame.quit()
+                    exit()
+
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_p: 
+                        isPaused = not isPaused
+                    elif event.key == pygame.K_m:
+                        toggle_mute()
+                    elif event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        exit()
+            continue
+
         screen.blit(background, (0, 0))
         font = pygame.font.Font(r'resources/fonts/SPACEBOY.ttf', 55)
         text = font.render("Space Invaders", True, (82, 242, 242))
@@ -68,6 +78,12 @@ def main_menu():
         text = font.render("4. M to mute", True, (159, 245, 185))
         screen.blit(text, (145, 425))
 
+        text = font.render("5. S to mute SFX", True, (159, 245, 185))
+        screen.blit(text, (145, 450))
+
+        text = font.render("6. ESC to Exit", True, (159, 245, 185))
+        screen.blit(text, (145, 475))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -76,10 +92,8 @@ def main_menu():
                 if event.key == pygame.K_m:
                     toggle_mute()
                 if event.key == pygame.K_p: 
-                    if pygame.mixer.music.get_busy():
-                        pygame.mixer.music.pause()
-                    else:
-                        pygame.mixer.music.unpause()
+                    # global isPaused
+                    isPaused = not isPaused
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     exit()
@@ -91,5 +105,4 @@ def main_menu():
 
 if __name__ == "__main__":
     main_menu()
-    # Start the game
     import space_invader    
