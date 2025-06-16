@@ -1,0 +1,1 @@
+ score_value = 100*(1 - elapsed_time / 120)

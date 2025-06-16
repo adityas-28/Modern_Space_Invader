@@ -66,10 +66,13 @@ enemy4Image = pygame.image.load(r'resources\images\ufo.png')
 enemy4Image = pygame.transform.scale(enemy4Image, (50, 50))
 
 def toggle_mute():
+    global music_enabled
     if pygame.mixer.music.get_busy():
         pygame.mixer.music.pause()
+        music_enabled = False
     else:
         pygame.mixer.music.unpause()
+        music_enabled = True
 
 
 def player(x, y):
@@ -128,7 +131,7 @@ def drawEnemies():
                 screen.blit(health_text, (645, 80))
 
 enemyPos = [
-    [0, 0, 1, 3, 1, 0, 0],
+    [0, 0, 1, 1, 1, 0, 0],
     [0, 1, 1, 1, 1, 1, 0],
     [1, 1, 1, 1, 1, 1, 1],
     [0, 1, 1, 1, 1, 1, 0],
@@ -221,7 +224,7 @@ textY = 10
 
 
 def show_score(x, y):
-    score = font.render("Score: " + str(score_value), True, (166, 134, 240))
+    score = font.render("Kills: " + str(score_value), True, (166, 134, 240))
     screen.blit(score, (x, y))
 
 
@@ -238,6 +241,13 @@ def gameOver(ifWon):
     screen.fill((0, 0, 0))
     screen.blit(gameOverBackground, (0, 0))
 
+    end_time = pygame.time.get_ticks()
+    elapsed_time = (end_time - start_time) / 1000
+
+    score_value = int(100*(1 - elapsed_time / 120))
+    if ifWon:
+        score_value += 100
+
     over_font = pygame.font.Font(r'resources/fonts/SPACEBOY.TTF', 60)
     small_font = pygame.font.Font(r'resources/fonts/SPACEBOY.TTF', 30)
 
@@ -252,12 +262,17 @@ def gameOver(ifWon):
     play_again_rect = pygame.Rect(screen.get_width() // 2 - 150, 450, 140, 50)
     quit_rect = pygame.Rect(screen.get_width() // 2 + 10, 450, 100, 50)
 
-    # pygame.mixer.music.pause()
 
-    global sfx_enabled
+    global sfx_enabled, music_enabled
     game_over_sound = None
     sound_played_time = None
     isPaused = False
+
+    if music_enabled:
+        if pygame.mixer.music.get_busy():
+            pygame.mixer.music.stop()
+        # Uncomment the next line if you want to pause the music instead of stopping it
+    pygame.mixer.music.pause()
 
     if sfx_enabled:
         sound_path = r'resources/sounds/gameWinBGM.mp3' if ifWon else r'resources/sounds/gameOverBGM.mp3'
@@ -351,9 +366,11 @@ BULLET_SPEED = 12
 
 isPaused = False
 sfx_enabled = True
+music_enabled = True
 
 while running:
     clock.tick(60)
+    start_time = pygame.time.get_ticks()
     if not isGameOver:
         if allEnemiesDead():
             isWon = True
