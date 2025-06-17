@@ -450,7 +450,7 @@ while running:
 
         drawEnemies()
 
-        player_bullets = []
+        player_bullets = [] 
 
         current_time = pygame.time.get_ticks()
         elapsed_time = (current_time - start_timer - pause_time) // 1000  
@@ -497,8 +497,9 @@ while running:
                         fire_bullet(bulletX, bulletY)
 
             elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                     playerX_change = 0
+                if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                     playerY_change = 0
 
         playerX += playerX_change

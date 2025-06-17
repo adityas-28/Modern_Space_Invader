@@ -17,10 +17,14 @@ mixer.music.set_volume(0.3)
 
 boss_image = pygame.image.load(r'resources\images\ufo.png')
 boss_image = pygame.transform.scale(boss_image, (85, 85))
-boss_x = 370
-boss_y = 50
+boss_x = 358
+boss_y = 75
 boss_x_change = 0
 boss_y_change = 0
+
+def update_boss_health(x, y, hits):
+    pygame.draw.rect(screen, (194, 194, 194), pygame.Rect(x, y, 100, 10))
+    pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(x, y, 100 - (10 * hits), 10))
 
 def show_boss(x, y):
     screen.blit(boss_image, (x, y)) 
@@ -28,24 +32,44 @@ def show_boss(x, y):
 playerImage = pygame.image.load(r'resources\images\spaceship (1).png')
 playerImage = pygame.transform.scale(playerImage, (55, 55))
 playerX = 375
-playerY = 500
+playerY = 450
 playerX_change = 0
 playerY_change = 0
 
 bulletImage = pygame.image.load(r'resources\images\bullet.png');
-bulletImage = pygame.transform.scale(bulletImage, (15, 15))
+bulletImage = pygame.transform.scale(bulletImage, (17, 17))
 bullet_state = False
 bulletX = 0
 bulletY = 0
 
 enemyBulletImage = pygame.image.load(r'resources\images\bulletEnemy.png');
 enemyBulletImage = pygame.transform.scale(enemyBulletImage, (15, 15))
-enemy_bullet_state = False
-enemy_bulletX = 0
-enemy_bulletY = 0
+enemy_bullets = []
+
+player_bullets = []
+
+def boss_fire_bullets(x, y, vx=0, vy=5):
+    enemy_bullets.append({'x': x, 'y': y, 'vx': vx, 'vy': vy})
+
+def player_fire_bullets(x, y):
+    player_bullets.append({'x': x, 'y': y})
+
+def player_collision(enemyBullet, playerX, playerY):
+    bullet_rect = pygame.Rect(enemyBullet['x'], enemyBullet['y'], enemyBulletImage.get_width(), enemyBulletImage.get_height())
+    player_rect = pygame.Rect(playerX, playerY, playerImage.get_width(), playerImage.get_height())
+    return bullet_rect.colliderect(player_rect)
+
+def boss_collision(playerBullet, bossX, bossY):
+    bullet_rect = pygame.Rect(playerBullet['x'], playerBullet['y'], bulletImage.get_width(), bulletImage.get_height())
+    boss_rect = pygame.Rect(bossX, bossY, boss_image.get_width(), boss_image.get_height())
+    return bullet_rect.colliderect(boss_rect)
 
 def show_player(x, y):
     screen.blit(playerImage, (x, y))
+
+def update_player_health(x, y, hits):
+    pygame.draw.rect(screen, (194, 194, 194), pygame.Rect(x, y, 90, 10))
+    pygame.draw.rect(screen, (48, 194, 56), pygame.Rect(x, y, 90 - (30 * hits), 10))
 
 def render_wrapped_text(text, font, color, max_width):
     words = text.split(' ')
@@ -68,11 +92,8 @@ start_font = pygame.font.Font(r'resources\fonts\typewriter.ttf', 28)
 def main_message():
     timer = pygame.time.Clock()
     messages = [
-        "I've locked onto the source — a rogue planet on the edge of the system.",
-        "Dark. Dead. Orbiting nothing.",
-        "That’s where he waits.",
-        "This is my final descent.",
-        "No retreat. No surrender.",
+        # "I've locked onto the source — a rogue planet on the edge of the system. Dark. Dead. Orbiting nothing.",
+        # "That’s where he waits. This is my final descent. No retreat. No surrender.",
         "Zarnax — I’m coming for you."
     ]
     current_message = 0
@@ -122,6 +143,18 @@ def main_message():
 
 running = True
 show_intro = True
+boss_hits = 0
+
+player_hits = 0
+playerSpeed = 1.25
+bossSpeed = 0.1
+boss_x_dir = 1 # right
+boss_y_dir = 1 # down
+BULLET_SPEED = 3
+last_shot_time = None
+player_last_shot_time = None
+boss_bullet_delay = 1000
+player_bullet_delay = 700
 
 while running:
     if show_intro:
@@ -131,9 +164,106 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+            pygame.quit()
+            exit()
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                playerX_change -= playerSpeed
+            if event.key == pygame.K_RIGHT:
+                playerX_change += playerSpeed
+            if event.key == pygame.K_UP:
+                playerY_change -= playerSpeed
+            if event.key == pygame.K_DOWN:
+                playerY_change += playerSpeed
+            if event.key == pygame.K_SPACE:
+                if curr_time - player_last_shot_time > player_bullet_delay:
+                    player_fire_bullets(playerX + 20, playerY)
+                    player_last_shot_time = curr_time
+
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                playerX_change = 0
+            if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                playerY_change = 0
 
     screen.blit(background, (0, 0))
-    show_boss(358, 75)
-    show_player(375, 450)
+
+    boss_x += boss_x_dir
+    boss_y += boss_y_dir
+
+    if boss_x >= 700:
+        boss_x_dir = -bossSpeed
+    if boss_x <= 20:
+        boss_x_dir = bossSpeed
+    if boss_y >= 250:
+        boss_y_dir = -bossSpeed
+    if boss_y <= 25:
+        boss_y_dir = bossSpeed
+
+    show_boss(boss_x, boss_y)
+    update_boss_health(boss_x - 10, boss_y - 25, boss_hits)
+
+    playerX += playerX_change
+    playerY += playerY_change
+    if playerX < 25:
+        playerX = 25
+    if playerX >= 720:
+        playerX = 720
+    if playerY < 350:
+        playerY = 350
+    if playerY >= 525:
+        playerY = 525
+    show_player(playerX, playerY)
+    update_player_health(playerX - 17, playerY + 60, player_hits)
+
+    curr_time = pygame.time.get_ticks()
+    
+    if player_last_shot_time is None:
+        player_last_shot_time = pygame.time.get_ticks()
+
+    if last_shot_time is None:
+        last_shot_time = pygame.time.get_ticks()
+
+    # curr_time = pygame.time.get_ticks()
+    if curr_time - last_shot_time > boss_bullet_delay:
+        boss_fire_bullets(boss_x + 32, boss_y + 70, vx=0, vy=2)
+        boss_fire_bullets(boss_x + 24, boss_y + 70, vx=-0.75, vy=1)
+        boss_fire_bullets(boss_x + 40, boss_y + 70, vx=0.75, vy=1)
+        last_shot_time = curr_time
+
+    for bullet in enemy_bullets[:]:
+        bullet['x'] += bullet['vx']
+        bullet['y'] += bullet['vy']
+
+        screen.blit(enemyBulletImage, (bullet['x'], bullet['y']))
+
+        if player_collision(bullet, playerX - 20, playerY + 10):
+            # if sfx_enabled:
+            #     mixer.Sound(r'resources\sounds\explosionWarning.mp3').play()
+            # noOfLives -= 1
+            enemy_bullets.remove(bullet)
+            player_hits += 1
+            # if noOfLives == 0:
+            #     isGameOver = True
+        if bullet['y'] > 600:
+            enemy_bullets.remove(bullet)
+
+
+    for bullet in player_bullets[:]:
+        bullet['y'] -= BULLET_SPEED
+
+        screen.blit(bulletImage, (bullet['x'], bullet['y']))
+
+        if boss_collision(bullet, boss_x, boss_y):
+            # if sfx_enabled:
+            #     mixer.Sound(r'resources\sounds\explosionWarning.mp3').play()
+            # noOfLives -= 1
+            player_bullets.remove(bullet)
+            boss_hits += 1
+            # if noOfLives == 0:
+            #     isGameOver = True
+        if bullet['y'] <= 0:
+            player_bullets.remove(bullet)
 
     pygame.display.update()
