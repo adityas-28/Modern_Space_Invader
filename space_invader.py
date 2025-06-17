@@ -2,6 +2,7 @@ import pygame
 import random
 import time
 from pygame import mixer
+import bossFight
 
 pygame.init()
 
@@ -410,7 +411,8 @@ while running:
     clock.tick(60)
     if not isGameOver:
         if allEnemiesDead():
-            isWon = True
+            isWon = bossFight.main_boss_fight()
+            # isWon = True
             isGameOver = True
         screen.fill((14, 8, 22))  # RGB
         screen.blit(background, (0, 0))
