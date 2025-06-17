@@ -20,8 +20,8 @@ def main_boss_fight():
     boss_image = pygame.transform.scale(boss_image, (85, 85))
     boss_image_angry = pygame.image.load(r'resources\images\ufoAngry.png')
     boss_image_angry = pygame.transform.scale(boss_image_angry, (85, 85))
-    boss_x = 358
-    boss_y = 75
+    boss_x = 5
+    boss_y = 5
 
     def update_boss_health(x, y, hits):
         pygame.draw.rect(screen, (194, 194, 194), pygame.Rect(x, y, 100, 10))
@@ -104,16 +104,19 @@ def main_boss_fight():
 
 
     def main_message():
+        enter_font = pygame.font.Font(r'resources/fonts/SPACEBOY.TTF', 20)
+        enter_message = enter_font.render("Press Enter to continue", True, (255, 255, 255))
+
         timer = pygame.time.Clock()
         
         messages = [
         "I’ve crushed every one of Zarnax’s minions. Only he remains.",
-        "I’ve locked onto the source — a rogue planet, dead and drifting on the edge of the system. Dark. Dead. Orbiting nothing. That’s where he waits. This is my final descent. No retreat. No surrender.",
-        "Zarnax — I’m coming for you."
+        "I’ve locked onto the source — a rogue planet, dead and drifting on the edge of the system. That’s where he waits.",
+        " This is my final descent. Zarnax — I’m coming for you."
         ]
         current_message = 0
         counter = 0
-        speed = 1
+        speed = 3
         done = False
         box_width, box_height = 800, 200
         box_x = (800 - box_width) // 2 
@@ -122,6 +125,7 @@ def main_boss_fight():
         while True:
             screen.blit(background, (0, 0))
             timer.tick(60)
+            screen.blit(enter_message, (screen.get_width() // 2 - enter_message.get_width() // 2, 500))
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -168,21 +172,19 @@ def main_boss_fight():
     bossSpeed = 0.1
     boss_x_dir = 1 # right
     boss_y_dir = 1 # down
-    BULLET_SPEED = 3
+    BULLET_SPEED = 2
     last_shot_time = None
     player_last_shot_time = None
-    boss_bullet_delay = 1000
     player_bullet_delay = 700
     boss_phase = "vulnerable"  # "burst" or "vulnerable"
     boss_burst_shots_fired = 0
     boss_last_shot_time = 0
     boss_burst_count = 100
     boss_burst_delay = 7  # time between each burst shot in milliseconds
-    boss_vulnerable_start = 0
     boss_vulnerable_hit = False
     boss_hit_time = 0
     pt = None
-    maxVulnerableDuration = 5000
+    maxVulnerableDuration = 3500
     sfx_enabled = True
     isPaused = False
     pause_start_time = None
@@ -398,3 +400,5 @@ def main_boss_fight():
                 player_bullets.remove(bullet)
 
         pygame.display.update()
+
+main_boss_fight()
