@@ -1,25 +1,42 @@
-# 🚀 Space Invader - Pygame
+# 🚀 Space Invader: Final Descent – Pygame Edition
 
-A retro-style **Space Invader game** built using **Python and Pygame**, featuring:
-- Multiple enemy types (including a boss with health)
-- Bullet collision mechanics
-- Health bar and score system
-- Background music and sound effects
-- Game Over screen with **Play Again** and **Quit** buttons
+A retro-futuristic **Space Invader** game built using **Python + Pygame**, featuring an intense **boss fight** finale. Strap in for a pixel-perfect battle with **Zarnax**, complete with cinematic intro, dynamic boss phases, and immersive sound design.
+
+---
+
+## 🧩 Features
+
+- 🎯 **Boss Mechanics** – Multi-phase fight with vulnerable/burst states  
+- 🎞️ **Narrative Intro** – Typewriter-style text crawl before the final descent  
+- 💥 **Bullet Collision System** – Real-time projectile detection  
+- 🩸 **Health Bars** – For both player and boss  
+- 🔊 **Sound & Music** – Laser blasts, explosions, and eerie background soundtrack  
+- ⏸️ **Pause/Mute Support** – `P` to pause, `M` to mute/unmute music, `S` to toggle SFX  
+- 💀 **Player Damage & Invincibility Frames**  
+- 🕹️ **Responsive Controls** – Smooth and precise movement  
+
+---
+
+## 🎮 Controls
+
+| Key         | Action              |
+|-------------|---------------------|
+| Arrow Keys  | Move the spaceship  |
+| Spacebar    | Fire bullet         |
+| P           | Pause/Unpause       |
+| M           | Mute/Unmute music   |
+| S           | Toggle sound effects|
+| Esc         | Quit the game       |
 
 ---
 
 ## 🖼️ Preview
 
-![Game Preview](preview1.png) 
-![Game Preview](preview2.png)
-![Game Preview](preview3.png)
----
-
-## 🎮 Controls
-
-- **Arrow Keys** – Move the spaceship
-- **Spacebar** – Fire bullets
+![Game Preview](resources/images/preview1.png)
+![Game Preview](resources/images/preview2.png)
+![Game Preview](resources/images/preview3.png)
+![Game Preview](resources/images/preview4.png)
+![Game Preview](resources/images/preview5.png)
 
 ---
 
@@ -35,77 +52,19 @@ A retro-style **Space Invader game** built using **Python and Pygame**, featurin
 ## ▶️ How to Run
 
 ### 🔹 Step 1: Install Requirements  
-Make sure Python is installed. Then install the Pygame module:
+Make sure Python is installed. Then install the Pygame module.
 
 ```bash
   pip install pygame
 ```
 ### 🔹 Step 2: Place All Required Files in the Same Folder
-Ensure the following files are in the same directory as space_invader.py:
-```
-- space_invader.py
-
-- background.jpg
-
-- spaceBg.jpg
-
-- spaceship.png
-
-- spaceship (1).png
-
-- alien1.png
-
-- alien2.png
-
-- alien3.png
-
-- ufo.png
-
-- bunker1.png
-
-- bunker2.png
-
-- bunker3.png
-
-- bullet.png
-
-- bulletEnemy.png
-
-- aliveHeart.png
-
-- deadHeart.png
-
-- bgm.mp3
-
-- laser2.wav
-
-- explosion.wav
-
-- explosionEnemy.mp3
-
-- explosionWarning.mp3
-
-- bgm.mp3
-
-- gameWinBGM.mp3
-
-- gameOverBGM.mp3
-
-- laser2.wav
-
-- explosion.wav
-
-- spaceboy.ttf
-
-- spacebar.ttf
-```
-
+Ensure that all requirements following files are in the same directory.
 ## 🔹 Step 3: Run the Game
 
 Open a terminal or command prompt, navigate to the folder where your game files are located, and run:
 
 ```bash
-  python space_invader.py
+  python menu.py
 ```
 ---
 
@@ -126,5 +85,5 @@ Open a terminal or command prompt, navigate to the folder where your game files 
 
 ## 👨‍💻 Author
 
-Made with ❤️ by [Aditya Singh](https://github.com/adityas-28)**
+Made with ❤️ by [Aditya Singh](https://github.com/adityas-28)
 =======

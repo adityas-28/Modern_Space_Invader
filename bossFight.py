@@ -122,7 +122,45 @@ def main_boss_fight():
         box_x = (800 - box_width) // 2 
         box_y = (600 - box_height) // 2  
 
+        isPaused = False
+        pause_start_time = None
+        pause_time = 0
+
         while True:
+            if isPaused:
+                screen.blit(background, (0, 0))
+                if pause_start_time is None:
+                    pause_start_time = pygame.time.get_ticks()
+                # pause_time += pygame.time.get_ticks() - pause_start_time
+                # pause_start_time = pygame.time.get_ticks()
+                pause_font = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 50)
+                pause_text = pause_font.render("Paused", True, (133, 255, 253))
+                pause_font_inner = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 25)
+                pause_text_inner = pause_font_inner.render("Press P to Unpause", True, (255, 255, 255))
+                
+                screen.blit(pause_text, (screen.get_width() // 2 - pause_text.get_width() // 2, screen.get_height() // 2 - pause_text.get_height() // 2))
+                screen.blit(pause_text_inner, (screen.get_width() // 2 - pause_text_inner.get_width() // 2, screen.get_height() // 2 + pause_text.get_height() // 2 + 15))
+
+                pygame.display.update()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
+
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_p: 
+                            pausesound = mixer.Sound(r'resources/sounds/pause.wav').play()
+                            isPaused = not isPaused
+                            if pause_start_time is not None:
+                                pause_time += pygame.time.get_ticks() - pause_start_time
+                            pause_start_time = None
+
+                        elif event.key == pygame.K_m:
+                            toggle_mute()
+                        elif event.key == pygame.K_ESCAPE:
+                            pygame.quit()
+                            exit()
+                continue    
+
             screen.blit(background, (0, 0))
             timer.tick(60)
             screen.blit(enter_message, (screen.get_width() // 2 - enter_message.get_width() // 2, 500))
@@ -133,13 +171,22 @@ def main_boss_fight():
                     exit()
 
                 elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_m:
+                        toggle_mute()
+                    if event.key == pygame.K_p: 
+                        isPaused = not isPaused
+                        pausesound = mixer.Sound(r'resources/sounds/pause.wav').play()
+                        # toggle_mute()
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        exit()
                     if event.key == pygame.K_RETURN and done:
                         if current_message < len(messages) - 1:
                             current_message += 1
                             counter = 0
                             done = False
                         else:
-                            return  # Done with all messages
+                            return  
 
             dialogue_box = pygame.Surface((box_width, box_height), pygame.SRCALPHA)
             dialogue_box.fill((0, 0, 0, 180))
