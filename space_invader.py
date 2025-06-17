@@ -395,6 +395,9 @@ isWon = False
 PLAYER_SPEED = 8
 BULLET_SPEED = 12
 
+player_blink = False
+player_blink_start_time = 0
+player_invincible_duration = 1000  
 isPaused = False
 sfx_enabled = True
 music_enabled = True
@@ -512,7 +515,17 @@ while running:
             playerY = 480
         if (playerY + playerY_change) >= 532:
             playerY = 532
-        player(playerX - 20, playerY + 10)
+        if player_blink:
+            if (curr_time - player_blink_start_time) < player_invincible_duration:
+                # Blink: Show player every few frames
+                if (curr_time // 100) % 2 == 0:
+                    player(playerX - 20, playerY + 10)  # visible
+                # else: invisible this frame
+            else:
+                player_blink = False  # End blink
+                player(playerX - 20, playerY + 10)
+        else:
+            player(playerX - 20, playerY + 10)
 
         if bulletY <= 0:
             bulletY = playerY
@@ -545,6 +558,8 @@ while running:
                 bulletX = playerX
                 bulletY = playerY
 
+        curr_time = pygame.time.get_ticks()
+
         for bullet in enemy_bullets[:]:
             bullet['y'] += BULLET_SPEED
             screen.blit(enemyBulletImage, (bullet['x'], bullet['y']))
@@ -557,6 +572,9 @@ while running:
                 enemy_bullets.remove(bullet)
 
             if isPlayerHit(bullet['x'], bullet['y'], playerX - 20, playerY + 10):
+                if not player_blink:
+                    player_blink = True
+                    player_blink_start_time = curr_time
                 if sfx_enabled:
                     mixer.Sound(r'resources\sounds\explosionWarning.mp3').play()
                 noOfLives -= 1

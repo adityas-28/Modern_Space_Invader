@@ -17,6 +17,8 @@ mixer.music.set_volume(0.3)
 
 boss_image = pygame.image.load(r'resources\images\ufo.png')
 boss_image = pygame.transform.scale(boss_image, (85, 85))
+boss_image_angry = pygame.image.load(r'resources\images\ufoAngry.png')
+boss_image_angry = pygame.transform.scale(boss_image_angry, (85, 85))
 boss_x = 358
 boss_y = 75
 boss_x_change = 0
@@ -27,7 +29,10 @@ def update_boss_health(x, y, hits):
     pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(x, y, 100 - (10 * hits), 10))
 
 def show_boss(x, y):
-    screen.blit(boss_image, (x, y)) 
+    if boss_phase == "vulnerable":
+        screen.blit(boss_image, (x, y)) 
+    else:
+        screen.blit(boss_image_angry, (x, y)) 
 
 playerImage = pygame.image.load(r'resources\images\spaceship (1).png')
 playerImage = pygame.transform.scale(playerImage, (55, 55))
@@ -42,8 +47,8 @@ bullet_state = False
 bulletX = 0
 bulletY = 0
 
-enemyBulletImage = pygame.image.load(r'resources\images\bulletEnemy.png');
-enemyBulletImage = pygame.transform.scale(enemyBulletImage, (15, 15))
+enemyBulletImage = pygame.image.load(r'resources\images\bossLaser.png');
+enemyBulletImage = pygame.transform.scale(enemyBulletImage, (5, 15))
 enemy_bullets = []
 
 player_bullets = []
@@ -145,6 +150,9 @@ running = True
 show_intro = True
 boss_hits = 0
 
+player_blink = False
+player_blink_start_time = 0
+player_invincible_duration = 1000  # milliseconds
 player_hits = 0
 playerSpeed = 1.25
 bossSpeed = 0.1
@@ -155,6 +163,13 @@ last_shot_time = None
 player_last_shot_time = None
 boss_bullet_delay = 1000
 player_bullet_delay = 700
+boss_phase = "burst"  # "burst" or "vulnerable"
+boss_burst_shots_fired = 0
+boss_last_shot_time = 0
+boss_burst_count = 100
+boss_burst_delay = 7  # time between each burst shot in milliseconds
+boss_vulnerable_start = 0
+
 
 while running:
     if show_intro:
@@ -214,7 +229,19 @@ while running:
         playerY = 350
     if playerY >= 525:
         playerY = 525
-    show_player(playerX, playerY)
+    # Handle blinking
+    if player_blink:
+        if (curr_time - player_blink_start_time) < player_invincible_duration:
+            # Blink: Show player every few frames
+            if (curr_time // 100) % 2 == 0:
+                show_player(playerX, playerY)  # visible
+            # else: invisible this frame
+        else:
+            player_blink = False  # End blink
+            show_player(playerX, playerY)
+    else:
+        show_player(playerX, playerY)
+
     update_player_health(playerX - 17, playerY + 60, player_hits)
 
     curr_time = pygame.time.get_ticks()
@@ -226,11 +253,34 @@ while running:
         last_shot_time = pygame.time.get_ticks()
 
     # curr_time = pygame.time.get_ticks()
-    if curr_time - last_shot_time > boss_bullet_delay:
-        boss_fire_bullets(boss_x + 32, boss_y + 70, vx=0, vy=2)
-        boss_fire_bullets(boss_x + 24, boss_y + 70, vx=-0.75, vy=1)
-        boss_fire_bullets(boss_x + 40, boss_y + 70, vx=0.75, vy=1)
-        last_shot_time = curr_time
+    # if curr_time - last_shot_time > boss_bullet_delay:
+    #     boss_fire_bullets(boss_x + 32, boss_y + 70, vx=0, vy=2)
+    #     boss_fire_bullets(boss_x + 24, boss_y + 70, vx=-0.75, vy=1)
+    #     boss_fire_bullets(boss_x + 40, boss_y + 70, vx=0.75, vy=1)
+    #     last_shot_time = curr_time
+
+    # Boss attack pattern logic
+    if boss_phase == "burst":
+        if boss_burst_shots_fired < boss_burst_count:
+            if curr_time - boss_last_shot_time > boss_burst_delay:
+                # Fire 3-direction burst
+                boss_fire_bullets(boss_x + 32, boss_y + 70, vx=0, vy=2)
+                boss_fire_bullets(boss_x + 24, boss_y + 70, vx=-1, vy=2)
+                boss_fire_bullets(boss_x + 40, boss_y + 70, vx=1, vy=2)
+                boss_burst_shots_fired += 1
+                boss_last_shot_time = curr_time
+        else:
+            # Transition to vulnerable phase
+            boss_phase = "vulnerable"
+            boss_vulnerable_start = curr_time
+            boss_burst_shots_fired = 0
+
+    elif boss_phase == "vulnerable":
+        # Boss is vulnerable for 3 seconds
+        if curr_time - boss_vulnerable_start > 3000:
+            boss_phase = "burst"
+            boss_last_shot_time = curr_time
+
 
     for bullet in enemy_bullets[:]:
         bullet['x'] += bullet['vx']
@@ -239,10 +289,15 @@ while running:
         screen.blit(enemyBulletImage, (bullet['x'], bullet['y']))
 
         if player_collision(bullet, playerX - 20, playerY + 10):
+            enemy_bullets.remove(bullet)
+            if not player_blink:
+                player_hits += 1
+                player_blink = True
+                player_blink_start_time = curr_time
             # if sfx_enabled:
             #     mixer.Sound(r'resources\sounds\explosionWarning.mp3').play()
             # noOfLives -= 1
-            enemy_bullets.remove(bullet)
+            # enemy_bullets.remove(bullet)
             player_hits += 1
             # if noOfLives == 0:
             #     isGameOver = True
@@ -260,7 +315,9 @@ while running:
             #     mixer.Sound(r'resources\sounds\explosionWarning.mp3').play()
             # noOfLives -= 1
             player_bullets.remove(bullet)
-            boss_hits += 1
+            if  boss_phase == "vulnerable":
+                boss_hits += 1
+
             # if noOfLives == 0:
             #     isGameOver = True
         if bullet['y'] <= 0:
