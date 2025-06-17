@@ -1,6 +1,6 @@
 # 🚀 Space Invader: Final Descent – Pygame Edition
 
-A retro-futuristic **Space Invader** game built using **Python + Pygame**, featuring an intense **boss fight** finale. Strap in for a pixel-perfect battle with **Zarnax**, complete with cinematic intro, dynamic boss phases, and immersive sound design.
+A retro-futuristic **Space Invader** game built using **Python + Pygame**, featuring an intense **boss fight** finale. Strap in for a pixel-perfect battle with **Zarnax**(our main villain), complete with cinematic intro, dynamic boss phases, and immersive sound design.
 
 ---
 
