@@ -1,6 +1,8 @@
-def main_boss_fight():   
+def main_boss_fight():  
     import pygame
     from pygame import mixer
+    import time 
+    import math
 
     pygame.init()
 
@@ -20,8 +22,8 @@ def main_boss_fight():
     boss_image = pygame.transform.scale(boss_image, (85, 85))
     boss_image_angry = pygame.image.load(r'resources\images\ufoAngry.png')
     boss_image_angry = pygame.transform.scale(boss_image_angry, (85, 85))
-    boss_x = 5
-    boss_y = 5
+    boss_x = 50
+    boss_y = 50
 
     def update_boss_health(x, y, hits):
         pygame.draw.rect(screen, (194, 194, 194), pygame.Rect(x, y, 100, 10))
@@ -40,11 +42,8 @@ def main_boss_fight():
     playerX_change = 0
     playerY_change = 0
 
-    bulletImage = pygame.image.load(r'resources\images\bullet.png');
+    bulletImage = pygame.image.load(r'resources\images\bulletLaser.png');
     bulletImage = pygame.transform.scale(bulletImage, (17, 17))
-    bullet_state = False
-    bulletX = 0
-    bulletY = 0
 
     enemyBulletImage = pygame.image.load(r'resources\images\bossLaser.png');
     enemyBulletImage = pygame.transform.scale(enemyBulletImage, (15, 15))
@@ -65,8 +64,20 @@ def main_boss_fight():
     def boss_fire_bullets(x, y, vx=0, vy=5):
         enemy_bullets.append({'x': x, 'y': y, 'vx': vx, 'vy': vy})
 
-    def player_fire_bullets(x, y):
-        player_bullets.append({'x': x, 'y': y})
+    def player_fire_bullets(x, y, angle):
+        speed = 5
+        radians = math.radians(angle)
+        vx = math.cos(radians) * speed
+        vy = -math.sin(radians) * speed  # negative because y-axis is downward
+
+        player_bullets.append({
+            'x': x,
+            'y': y,
+            'vx': vx,
+            'vy': vy,
+            'angle': angle
+        })
+
 
     def player_collision(enemyBullet, playerX, playerY):
         bullet_rect = pygame.Rect(enemyBullet['x'], enemyBullet['y'], enemyBulletImage.get_width(), enemyBulletImage.get_height())
@@ -78,8 +89,15 @@ def main_boss_fight():
         boss_rect = pygame.Rect(bossX, bossY, boss_image.get_width(), boss_image.get_height())
         return bullet_rect.colliderect(boss_rect)
 
-    def show_player(x, y):
-        screen.blit(playerImage, (x, y))
+    def show_rotated_player(player_x, player_y, boss_x, boss_y, player_img):
+        dx = boss_x - player_x
+        dy = boss_y - player_y
+        angle = math.degrees(math.atan2(-dy, dx)) - 90
+        rotated_img = pygame.transform.rotate(player_img, angle)
+        rotated_rect = rotated_img.get_rect(center=(player_x + player_img.get_width() // 2,
+                                                    player_y + player_img.get_height() // 2))
+        screen.blit(rotated_img, rotated_rect.topleft)
+
 
     def update_player_health(x, y, hits):
         pygame.draw.rect(screen, (194, 194, 194), pygame.Rect(x, y, 90, 10))
@@ -102,8 +120,227 @@ def main_boss_fight():
 
     start_font = pygame.font.Font(r'resources\fonts\typewriter.ttf', 28)
 
+    def main_message3(victory=True):
+        end_font = pygame.font.Font(r'resources/fonts/typewriter.ttf', 28)
+        enter_font = pygame.font.Font(r'resources/fonts/SPACEBOY.TTF', 20)
+        enter_message = enter_font.render("Press Enter to continue", True, (255, 255, 255))
+        timer = pygame.time.Clock()
+
+        # Load images
+        playerImage = pygame.image.load(r'resources\images\spaceship (1).png')
+        playerImage = pygame.transform.scale(playerImage, (150, 150))
+
+        bossImage = pygame.image.load(r'resources\images\ufoAngry.png')
+        bossImage = pygame.transform.scale(bossImage, (150, 150))
+
+        # Messages
+        if victory:
+            messages = [
+                "Zarnax is no more. The rogue planet crumbles without his power. The galaxy is safe... for now. But peace never lasts forever."
+            ]
+            image_to_show = playerImage
+        else:
+            messages = [
+                "Your ship lies in ruins. Zarnax watches as silence returns to space. You fought bravely — but it wasn’t enough. This galaxy now belongs to him."
+            ]
+            image_to_show = bossImage
+
+        current_message = 0
+        counter = 0
+        speed = 3
+        done = False
+        box_width, box_height = 800, 200
+        box_x = (800 - box_width) // 2
+        box_y = (600 - box_height) // 2 + 50
+
+        isPaused = False
+        pause_start_time = None
+        pause_time = 0
+        first_time = True
+
+        while True:
+            if isPaused:
+                screen.blit(background, (0, 0))
+                if pause_start_time is None:
+                    pause_start_time = pygame.time.get_ticks()
+                pause_text = enter_font.render("Paused - Press P to Resume", True, (255, 255, 255))
+                screen.blit(pause_text, (screen.get_width() // 2 - pause_text.get_width() // 2, screen.get_height() // 2))
+                pygame.display.update()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        exit()
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_p: 
+                            mixer.Sound(r'resources/sounds/pause.wav').play()
+                            isPaused = not isPaused
+                            if pause_start_time is not None:
+                                pause_time += pygame.time.get_ticks() - pause_start_time
+                            pause_start_time = None
+                        elif event.key == pygame.K_m:
+                            toggle_mute()
+                        elif event.key == pygame.K_ESCAPE:
+                            pygame.quit()
+                            exit()
+                continue
+
+            screen.blit(background, (0, 0))
+            screen.blit(image_to_show, (screen.get_width() // 2 - image_to_show.get_width() // 2, 80))
+            screen.blit(enter_message, (screen.get_width() // 2 - enter_message.get_width() // 2, 500))
+            if first_time:
+                time.sleep(1)
+                first_time = False
+
+            timer.tick(60)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_m:
+                        toggle_mute()
+                    if event.key == pygame.K_p:
+                        mixer.Sound(r'resources/sounds/pause.wav').play()
+                        isPaused = not isPaused
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        exit()
+                    if event.key == pygame.K_RETURN and done:
+                        if current_message < len(messages) - 1:
+                            current_message += 1
+                            counter = 0
+                            done = False
+                        else:
+                            return
+
+
+            dialogue_box = pygame.Surface((box_width, box_height), pygame.SRCALPHA)
+            dialogue_box.fill((0, 0, 0, 180))
+            screen.blit(dialogue_box, (box_x, box_y))
+
+            if counter < speed * len(messages[current_message]):
+                counter += 1
+            else:
+                done = True
+
+            text_to_display = messages[current_message][0:counter // speed]
+            wrapped_lines = render_wrapped_text(text_to_display, end_font, (255, 255, 255), box_width - 40)
+
+            for i, line in enumerate(wrapped_lines):
+                snip = end_font.render(line, True, (255, 255, 255))
+                line_y = box_y + 20 + i * 30
+                screen.blit(snip, (box_x + 20, line_y))
+
+            pygame.display.update()
+
+
+    def second_message():
+        enter_font = pygame.font.Font(r'resources/fonts/SPACEBOY.TTF', 20)
+        enter_message = enter_font.render("Press Enter to continue", True, (255, 255, 255))
+        timer = pygame.time.Clock()
+
+        boss_image = pygame.image.load(r'resources\images\ufo.png')
+        boss_image = pygame.transform.scale(boss_image, (150, 150))
+
+        dialogue_font = pygame.font.Font(r'resources\fonts\typewriter.ttf', 28)
+        messages = [
+    "So... you've made it this far. Impressive — for a mortal. But your journey ends here. You truly believe you can defeat *me*? Foolish. Now, prepare to be annihilated!"
+    ]
+
+        current_message = 0
+        counter = 0
+        speed = 3
+        done = False
+        box_width, box_height = 800, 200
+        box_x = (800 - box_width) // 2 
+        box_y = (600 - box_height) // 2 + 50
+
+        isPaused = False
+        pause_start_time = None
+        pause_time = 0
+
+        while True:
+            if isPaused:
+                screen.blit(background, (0, 0))
+                if pause_start_time is None:
+                    pause_start_time = pygame.time.get_ticks()
+                pause_font = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 50)
+                pause_text = pause_font.render("Paused", True, (133, 255, 253))
+                pause_text_inner = enter_font.render("Press P to Unpause", True, (255, 255, 255))
+
+                screen.blit(pause_text, (screen.get_width() // 2 - pause_text.get_width() // 2, screen.get_height() // 2 - pause_text.get_height() // 2))
+                screen.blit(pause_text_inner, (screen.get_width() // 2 - pause_text_inner.get_width() // 2, screen.get_height() // 2 + pause_text.get_height() // 2 + 15))
+
+                pygame.display.update()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        exit()
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_p: 
+                            mixer.Sound(r'resources/sounds/pause.wav').play()
+                            isPaused = not isPaused
+                            if pause_start_time is not None:
+                                pause_time += pygame.time.get_ticks() - pause_start_time
+                            pause_start_time = None
+                        elif event.key == pygame.K_m:
+                            toggle_mute()
+                        elif event.key == pygame.K_ESCAPE:
+                            pygame.quit()
+                            exit()
+                continue
+
+            screen.blit(background, (0, 0))
+            screen.blit(boss_image, (screen.get_width() // 2 - boss_image.get_width() // 2, 80))
+
+            screen.blit(enter_message, (screen.get_width() // 2 - enter_message.get_width() // 2, 500))
+            timer.tick(60)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_m:
+                        toggle_mute()
+                    if event.key == pygame.K_p:
+                        isPaused = not isPaused
+                        mixer.Sound(r'resources/sounds/pause.wav').play()
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        exit()
+                    if event.key == pygame.K_RETURN and done:
+                        if current_message < len(messages) - 1:
+                            current_message += 1
+                            counter = 0
+                            done = False
+                        else:
+                            return
+
+            dialogue_box = pygame.Surface((box_width, box_height), pygame.SRCALPHA)
+            dialogue_box.fill((0, 0, 0, 180))
+            screen.blit(dialogue_box, (box_x, box_y))
+
+            if counter < speed * len(messages[current_message]):
+                counter += 1
+            else:
+                done = True
+
+            text_to_display = messages[current_message][0:counter // speed]
+            wrapped_lines = render_wrapped_text(text_to_display, dialogue_font, (255, 255, 255), box_width - 40)
+
+            for i, line in enumerate(wrapped_lines):
+                snip = dialogue_font.render(line, True, (255, 255, 255))
+                line_y = box_y + 20 + i * 30
+                screen.blit(snip, (box_x + 20, line_y))
+
+            pygame.display.update()
+
+
 
     def main_message():
+        time.sleep(1)
         enter_font = pygame.font.Font(r'resources/fonts/SPACEBOY.TTF', 20)
         enter_message = enter_font.render("Press Enter to continue", True, (255, 255, 255))
 
@@ -131,8 +368,6 @@ def main_boss_fight():
                 screen.blit(background, (0, 0))
                 if pause_start_time is None:
                     pause_start_time = pygame.time.get_ticks()
-                # pause_time += pygame.time.get_ticks() - pause_start_time
-                # pause_start_time = pygame.time.get_ticks()
                 pause_font = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 50)
                 pause_text = pause_font.render("Paused", True, (133, 255, 253))
                 pause_font_inner = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 25)
@@ -144,11 +379,12 @@ def main_boss_fight():
                 pygame.display.update()
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
-                        running = False
+                        pygame.quit()
+                        exit()
 
                     elif event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_p: 
-                            pausesound = mixer.Sound(r'resources/sounds/pause.wav').play()
+                            mixer.Sound(r'resources/sounds/pause.wav').play()
                             isPaused = not isPaused
                             if pause_start_time is not None:
                                 pause_time += pygame.time.get_ticks() - pause_start_time
@@ -175,7 +411,7 @@ def main_boss_fight():
                         toggle_mute()
                     if event.key == pygame.K_p: 
                         isPaused = not isPaused
-                        pausesound = mixer.Sound(r'resources/sounds/pause.wav').play()
+                        mixer.Sound(r'resources/sounds/pause.wav').play()
                         # toggle_mute()
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
@@ -207,6 +443,12 @@ def main_boss_fight():
 
             pygame.display.update()
 
+    def boss_hits_player(boss_x, boss_y, player_x, player_y, boss_image, player_image):
+        boss_rect = pygame.Rect(boss_x, boss_y, boss_image.get_width(), boss_image.get_height())
+        player_rect = pygame.Rect(player_x, player_y, player_image.get_width(), player_image.get_height())
+        return boss_rect.colliderect(player_rect)
+
+
     running = True
     show_intro = True
     boss_hits = 0
@@ -215,7 +457,7 @@ def main_boss_fight():
     player_blink_start_time = 0
     player_invincible_duration = 1000  # milliseconds
     player_hits = 0
-    playerSpeed = 1.25
+    playerSpeed = 0.75
     bossSpeed = 0.1
     boss_x_dir = 1 # right
     boss_y_dir = 1 # down
@@ -240,14 +482,13 @@ def main_boss_fight():
     while running:
         if show_intro:
             main_message()
+            second_message()
             show_intro = False  
 
         if isPaused:
             screen.blit(background, (0, 0))
             if pause_start_time is None:
                 pause_start_time = pygame.time.get_ticks()
-            # pause_time += pygame.time.get_ticks() - pause_start_time
-            # pause_start_time = pygame.time.get_ticks()
             pause_font = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 50)
             pause_text = pause_font.render("Paused", True, (133, 255, 253))
             pause_font_inner = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 25)
@@ -263,7 +504,7 @@ def main_boss_fight():
 
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_p: 
-                        pausesound = mixer.Sound(r'resources/sounds/pause.wav').play()
+                        mixer.Sound(r'resources/sounds/pause.wav').play()
                         isPaused = not isPaused
                         if pause_start_time is not None:
                             pause_time += pygame.time.get_ticks() - pause_start_time
@@ -306,7 +547,12 @@ def main_boss_fight():
                     if sfx_enabled:
                         mixer.Sound(r'resources\sounds\laser2.wav').play()
                     if curr_time - player_last_shot_time > player_bullet_delay:
-                        player_fire_bullets(playerX + 20, playerY)
+                        dx = boss_x - playerX
+                        dy = boss_y - playerY
+                        angle = math.degrees(math.atan2(-dy, dx))  # same as used for rotating the player
+
+                        player_fire_bullets(playerX + 20, playerY, angle)
+
                         player_last_shot_time = curr_time
 
             elif event.type == pygame.KEYUP:
@@ -317,17 +563,18 @@ def main_boss_fight():
 
         screen.blit(background, (0, 0))
 
-        boss_x += boss_x_dir
-        boss_y += boss_y_dir
+        boss_x += bossSpeed * boss_x_dir
+        boss_y += bossSpeed * boss_y_dir
 
         if boss_x >= 700:
-            boss_x_dir = -bossSpeed
-        if boss_x <= 20:
-            boss_x_dir = bossSpeed
-        if boss_y >= 250:
-            boss_y_dir = -bossSpeed
-        if boss_y <= 25:
-            boss_y_dir = bossSpeed
+            boss_x_dir = -1
+        if boss_x <= 25:
+            boss_x_dir = 1
+        if boss_y >= 490:
+            boss_y_dir = -1
+        if boss_y <= 30:
+            boss_y_dir = 1
+
 
         show_boss(boss_x, boss_y)
         update_boss_health(boss_x - 10, boss_y - 25, boss_hits)
@@ -336,10 +583,10 @@ def main_boss_fight():
         playerY += playerY_change
         if playerX < 25:
             playerX = 25
-        if playerX >= 720:
-            playerX = 720
-        if playerY < 350:
-            playerY = 350
+        if playerX >= 710:
+            playerX = 710
+        if playerY <= 15:
+            playerY = 15
         if playerY >= 525:
             playerY = 525
         # Handle blinking
@@ -347,13 +594,13 @@ def main_boss_fight():
             if (curr_time - player_blink_start_time) < player_invincible_duration:
                 # Blink: Show player every few frames
                 if (curr_time // 100) % 2 == 0:
-                    show_player(playerX, playerY)  # visible
+                    show_rotated_player(playerX, playerY, boss_x, boss_y, playerImage)  # visible
                 # else: invisible this frame
             else:
                 player_blink = False  # End blink
-                show_player(playerX, playerY)
+                show_rotated_player(playerX, playerY, boss_x, boss_y, playerImage)
         else:
-            show_player(playerX, playerY)
+            show_rotated_player(playerX, playerY, boss_x, boss_y, playerImage)
 
         update_player_health(playerX - 17, playerY + 60, player_hits)
 
@@ -381,17 +628,26 @@ def main_boss_fight():
                     mixer.Sound(r'resources\sounds\bossLaser.mp3').play()
                     
 
+                # Spiral / radial bullet pattern
                 if curr_time - boss_last_shot_time > boss_burst_delay:
-                    # Fire 3-direction burst
-                    boss_fire_bullets(boss_x + 32, boss_y + 70, vx=0, vy=2)
-                    boss_fire_bullets(boss_x + 24, boss_y + 70, vx=-1, vy=2)
-                    boss_fire_bullets(boss_x + 40, boss_y + 70, vx=1, vy=2)
-                    
+                    bullets_per_shot = 5 # Increase for denser spiral
+                    spiral_speed = 1     # Adjust bullet speed
+                    angle_offset = boss_burst_shots_fired * 0.75 # For spiral motion
+
+                    for i in range(bullets_per_shot):
+                        angle_deg = (360 / bullets_per_shot) * i + angle_offset
+                        angle_rad = math.radians(angle_deg)
+
+                        vx = math.cos(angle_rad) * spiral_speed
+                        vy = math.sin(angle_rad) * spiral_speed
+
+                        boss_fire_bullets(boss_x + 40, boss_y + 40, vx=vx, vy=vy)
+
                     boss_burst_shots_fired += 1
                     boss_last_shot_time = curr_time
+                    
             else:
                 boss_phase = "vulnerable"
-                boss_vulnerable_start = curr_time
                 boss_burst_shots_fired = 0
                 pt = curr_time  # <-- Set PT correctly when entering vulnerable state
                 boss_vulnerable_hit = False
@@ -400,10 +656,20 @@ def main_boss_fight():
         elif boss_phase == "vulnerable":
         # Wait for player to hit during this phase
             if boss_vulnerable_hit:
-                if curr_time - boss_hit_time > 1000:  # 1 sec delay after hit
+                if curr_time - boss_hit_time > 550:  # 550 ms delay after hit
                     boss_phase = "burst"
                     boss_last_shot_time = curr_time
                     boss_vulnerable_hit = False  # Reset for next time
+
+        if boss_hits_player(boss_x, boss_y, playerX, playerY, boss_image, playerImage):
+            if not player_blink:  # optional invincibility check
+                player_hits += 1
+                player_blink = True
+                player_blink_start_time = curr_time
+                if sfx_enabled:
+                    mixer.Sound(r'resources\sounds\explosionWarning.mp3').play()
+                if player_hits >= 5:
+                    return False  # game over or defeat
 
 
         for bullet in enemy_bullets[:]:
@@ -420,6 +686,7 @@ def main_boss_fight():
                     player_blink = True
                     player_blink_start_time = curr_time
                     if player_hits == 5:
+                        main_message3(victory=False)
                         return False
                 enemy_bullets.remove(bullet)  # Remove bullet whether or not it caused damage
 
@@ -428,9 +695,13 @@ def main_boss_fight():
 
 
         for bullet in player_bullets[:]:
-            bullet['y'] -= BULLET_SPEED
+            bullet['x'] += bullet['vx']
+            bullet['y'] += bullet['vy']
 
-            screen.blit(bulletImage, (bullet['x'], bullet['y']))
+            rotated_bullet = pygame.transform.rotate(bulletImage, bullet['angle'])
+            bullet_rect = rotated_bullet.get_rect(center=(bullet['x'], bullet['y']))
+
+            screen.blit(rotated_bullet, bullet_rect.topleft)
 
             if boss_collision(bullet, boss_x, boss_y):
                 if sfx_enabled:
@@ -442,10 +713,12 @@ def main_boss_fight():
                     boss_hit_time = curr_time  # Start 1-second timer after hit
 
                 if boss_hits == 10:
+                    main_message3(victory=True)
                     return True
-            if bullet['y'] <= 0:
+                
+            if bullet['y'] < 0 or bullet['y'] > 600 or bullet['x'] < 0 or bullet['x'] > 800:
                 player_bullets.remove(bullet)
 
         pygame.display.update()
 
-# main_boss_fight()
+main_boss_fight()
