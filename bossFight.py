@@ -65,7 +65,7 @@ def main_boss_fight():
         enemy_bullets.append({'x': x, 'y': y, 'vx': vx, 'vy': vy})
 
     def player_fire_bullets(x, y, angle):
-        speed = 5
+        speed = 12
         radians = math.radians(angle)
         vx = math.cos(radians) * speed
         vy = -math.sin(radians) * speed  # negative because y-axis is downward
@@ -141,13 +141,13 @@ def main_boss_fight():
             image_to_show = playerImage
         else:
             messages = [
-                "Your ship lies in ruins. Zarnax watches as silence returns to space. You fought bravely — but it wasn’t enough. This galaxy now belongs to him."
+                "Your ship lies in ruins. Zarnax watches as silence returns to space. You fought bravely — but it wasn’t enough. This galaxy now belongs to me. HaHaHa !"
             ]
             image_to_show = bossImage
 
         current_message = 0
         counter = 0
-        speed = 3
+        speed = 2
         done = False
         box_width, box_height = 800, 200
         box_x = (800 - box_width) // 2
@@ -457,18 +457,17 @@ def main_boss_fight():
     player_blink_start_time = 0
     player_invincible_duration = 1000  # milliseconds
     player_hits = 0
-    playerSpeed = 0.75
-    bossSpeed = 0.1
+    playerSpeed = 7
+    bossSpeed = 2
     boss_x_dir = 1 # right
     boss_y_dir = 1 # down
-    BULLET_SPEED = 2
     last_shot_time = None
     player_last_shot_time = None
     player_bullet_delay = 700
     boss_phase = "vulnerable"  # "burst" or "vulnerable"
     boss_burst_shots_fired = 0
     boss_last_shot_time = 0
-    boss_burst_count = 100
+    boss_burst_count = 55
     boss_burst_delay = 7  # time between each burst shot in milliseconds
     boss_vulnerable_hit = False
     boss_hit_time = 0
@@ -478,8 +477,10 @@ def main_boss_fight():
     isPaused = False
     pause_start_time = None
     pause_time = 0
+    clock = pygame.time.Clock()
 
     while running:
+        clock.tick(60)
         if show_intro:
             main_message()
             second_message()
@@ -536,7 +537,7 @@ def main_boss_fight():
                     toggle_mute()
                 if event.key == pygame.K_p: 
                     isPaused = not isPaused
-                    pausesound = mixer.Sound(r'resources/sounds/pause.wav').play()
+                    mixer.Sound(r'resources/sounds/pause.wav').play()
                     # toggle_mute()
                 if event.key == pygame.K_s:
                     sfx_enabled = not sfx_enabled
@@ -551,7 +552,9 @@ def main_boss_fight():
                         dy = boss_y - playerY
                         angle = math.degrees(math.atan2(-dy, dx))  # same as used for rotating the player
 
-                        player_fire_bullets(playerX + 20, playerY, angle)
+                        player_center_x = playerX + playerImage.get_width() // 2
+                        player_center_y = playerY + playerImage.get_height() // 2
+                        player_fire_bullets(player_center_x, player_center_y, angle)
 
                         player_last_shot_time = curr_time
 
@@ -626,13 +629,12 @@ def main_boss_fight():
             if boss_burst_shots_fired < boss_burst_count:
                 if boss_burst_shots_fired == 0 and sfx_enabled:
                     mixer.Sound(r'resources\sounds\bossLaser.mp3').play()
-                    
 
                 # Spiral / radial bullet pattern
                 if curr_time - boss_last_shot_time > boss_burst_delay:
                     bullets_per_shot = 5 # Increase for denser spiral
-                    spiral_speed = 1     # Adjust bullet speed
-                    angle_offset = boss_burst_shots_fired * 0.75 # For spiral motion
+                    spiral_speed = 10    # Adjust bullet speed
+                    angle_offset = boss_burst_shots_fired * 1 # For spiral motion
 
                     for i in range(bullets_per_shot):
                         angle_deg = (360 / bullets_per_shot) * i + angle_offset
@@ -721,4 +723,4 @@ def main_boss_fight():
 
         pygame.display.update()
 
-main_boss_fight()
+# main_boss_fight()
