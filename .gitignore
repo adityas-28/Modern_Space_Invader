@@ -17,3 +17,6 @@ Thumbs.db
 
 #Ignore zip files
 *.zip
+
+#Ignore High score file
+highscore.txt
