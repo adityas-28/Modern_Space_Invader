@@ -160,8 +160,13 @@ def main_boss_fight():
                 screen.blit(background, (0, 0))
                 if pause_start_time is None:
                     pause_start_time = pygame.time.get_ticks()
-                pause_text = enter_font.render("Paused - Press P to Resume", True, (255, 255, 255))
-                screen.blit(pause_text, (screen.get_width() // 2 - pause_text.get_width() // 2, screen.get_height() // 2))
+                pause_font = pygame.font.Font(r'resources\fonts\SPACEBOY.TTF', 50)
+                pause_text = pause_font.render("Paused", True, (133, 255, 253))
+                pause_text_inner = enter_font.render("Press P to Unpause", True, (255, 255, 255))
+
+                screen.blit(pause_text, (screen.get_width() // 2 - pause_text.get_width() // 2, screen.get_height() // 2 - pause_text.get_height() // 2))
+                screen.blit(pause_text_inner, (screen.get_width() // 2 - pause_text_inner.get_width() // 2, screen.get_height() // 2 + pause_text.get_height() // 2 + 15))
+
                 pygame.display.update()
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
