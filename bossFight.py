@@ -203,13 +203,17 @@ def main_boss_fight():
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
                         exit()
-                    if event.key == pygame.K_RETURN and done:
-                        if current_message < len(messages) - 1:
-                            current_message += 1
-                            counter = 0
-                            done = False
+                    elif event.key == pygame.K_RETURN:
+                        if not done:
+                            counter = speed * len(messages[current_message])
+                            done = True
                         else:
-                            return
+                            if current_message < len(messages) - 1:
+                                current_message += 1
+                                counter = 0
+                                done = False
+                            else:
+                                return
 
 
             dialogue_box = pygame.Surface((box_width, box_height), pygame.SRCALPHA)
@@ -307,13 +311,18 @@ def main_boss_fight():
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
                         exit()
-                    if event.key == pygame.K_RETURN and done:
-                        if current_message < len(messages) - 1:
-                            current_message += 1
-                            counter = 0
-                            done = False
+                    elif event.key == pygame.K_RETURN:
+                        if not done:
+                            counter = speed * len(messages[current_message])
+                            done = True
                         else:
-                            return
+                            if current_message < len(messages) - 1:
+                                current_message += 1
+                                counter = 0
+                                done = False
+                            else:
+                                return
+
 
             dialogue_box = pygame.Surface((box_width, box_height), pygame.SRCALPHA)
             dialogue_box.fill((0, 0, 0, 180))
@@ -413,13 +422,17 @@ def main_boss_fight():
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
                         exit()
-                    if event.key == pygame.K_RETURN and done:
-                        if current_message < len(messages) - 1:
-                            current_message += 1
-                            counter = 0
-                            done = False
+                    elif event.key == pygame.K_RETURN:
+                        if not done:
+                            counter = speed * len(messages[current_message])
+                            done = True
                         else:
-                            return  
+                            if current_message < len(messages) - 1:
+                                current_message += 1
+                                counter = 0
+                                done = False
+                            else:
+                                return
 
             dialogue_box = pygame.Surface((box_width, box_height), pygame.SRCALPHA)
             dialogue_box.fill((0, 0, 0, 180))

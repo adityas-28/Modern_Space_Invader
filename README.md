@@ -1,5 +1,6 @@
 ![Python](https://img.shields.io/badge/python-3.1-blue)
 ![Pygame](https://img.shields.io/badge/pygame-green)
+
 # 🚀 Space Invader: Final Descent – Pygame Edition
 
 A retro-futuristic **Space Invader** game built using **Python + Pygame**, featuring an intense **boss fight** finale. Strap in for a pixel-perfect battle with **Zarnax**(our main villain), complete with cinematic intro, dynamic boss phases, and immersive sound design.
@@ -8,27 +9,27 @@ A retro-futuristic **Space Invader** game built using **Python + Pygame**, featu
 
 ## 🧩 Features
 
-- 🎯 **Boss Mechanics** – Multi-phase fight with vulnerable/burst states  
-- 🎞️ **Narrative Intro** – Typewriter-style text crawl before the final descent  
-- 💥 **Bullet Collision System** – Real-time projectile detection  
-- 🩸 **Health Bars** – For both player and boss  
-- 🔊 **Sound & Music** – Laser blasts, explosions, and eerie background soundtrack  
-- ⏸️ **Pause/Mute Support** – `P` to pause, `M` to mute/unmute music, `S` to toggle SFX  
-- 💀 **Player Damage & Invincibility Frames**  
-- 🕹️ **Responsive Controls** – Smooth and precise movement  
+- 🎯 **Boss Mechanics** – Multi-phase fight with vulnerable/burst states
+- 🎞️ **Narrative Intro** – Typewriter-style text crawl before the final descent
+- 💥 **Bullet Collision System** – Real-time projectile detection
+- 🩸 **Health Bars** – For both player and boss
+- 🔊 **Sound & Music** – Laser blasts, explosions, and eerie background soundtrack
+- ⏸️ **Pause/Mute Support** – `P` to pause, `M` to mute/unmute music, `S` to toggle SFX
+- 💀 **Player Damage & Invincibility Frames**
+- 🕹️ **Responsive Controls** – Smooth and precise movement
 
 ---
 
 ## 🎮 Controls
 
-| Key         | Action              |
-|-------------|---------------------|
-| Arrow Keys  | Move the spaceship  |
-| Spacebar    | Fire bullet         |
-| P           | Pause/Unpause       |
-| M           | Mute/Unmute music   |
-| S           | Toggle sound effects|
-| Esc         | Quit the game       |
+| Key        | Action               |
+| ---------- | -------------------- |
+| Arrow Keys | Move the spaceship   |
+| Spacebar   | Fire bullet          |
+| P          | Pause/Unpause        |
+| M          | Mute/Unmute music    |
+| S          | Toggle sound effects |
+| Esc        | Quit the game        |
 
 ---
 
@@ -48,29 +49,36 @@ A retro-futuristic **Space Invader** game built using **Python + Pygame**, featu
 - `Pygame` module
 
 - Install using:
-`pip install pygame`
+  `pip install pygame`
 
 ---
+
 ## ▶️ How to Run
 
-### 🔹 Step 1: Install Requirements  
+### 🔹 Step 1: Install Requirements
+
 Make sure Python is installed. Then install the Pygame module.
 
 ```bash
   pip install pygame
 ```
+
 ### 🔹 Step 2: Place All Required Files in the Same Folder
+
 Ensure that all requirements following files are in the same directory.
+
 ## 🔹 Step 3: Run the Game
 
 Open a terminal or command prompt, navigate to the folder where your game files are located, and run:
 
 ```bash
-  python menu.py
+  python main.py
 ```
+
 ---
 
 ## 💡 Features
+
 **🎯 Bullet Collision** – Destroy enemies before they reach you.
 
 **🧠 Boss Enemy** – Fight a UFO with higher health.
@@ -87,5 +95,4 @@ Open a terminal or command prompt, navigate to the folder where your game files 
 
 ## 👨‍💻 Author
 
-Made with ❤️ by [Aditya Singh](https://github.com/adityas-28)
-=======
+# Made with ❤️ by [Aditya Singh](https://github.com/adityas-28)

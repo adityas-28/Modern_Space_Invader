@@ -393,6 +393,7 @@ def main_game():
     maxTimeLimit = 120 
     pause_time = 0
     pause_start_time = None
+    bullet_state = True
 
     while running:
         clock.tick(60)
@@ -478,9 +479,11 @@ def main_game():
                     elif event.key == pygame.K_DOWN:
                         playerY_change += PLAYER_SPEED
                     if event.key == pygame.K_SPACE:
-                        fire_bullet(playerX, playerY)
-                        if settings.sfx_enabled:
-                            mixer.Sound(r'resources\sounds\laser2.wav').play()
+                        if bullet_state:
+                            fire_bullet(playerX, playerY)
+                            bullet_state = False
+                            if settings.sfx_enabled:
+                                mixer.Sound(r'resources\sounds\laser2.wav').play()
 
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
@@ -494,6 +497,7 @@ def main_game():
 
                 if bullet['y'] < 0:
                     player_bullets.remove(bullet)
+                    bullet_state = True
                     
                 collided_enemy = isCollision(bullet['x'], bullet['y'])
                 if collided_enemy:
@@ -505,10 +509,15 @@ def main_game():
                         enemyAliveLocations[collided_enemy['x_pos']][collided_enemy['y_pos']] = 0
                         score_value += 1
                     player_bullets.remove(bullet)
+                    bullet_state = True
 
                 hit_bunker = isBunkerHit(bullet['x'], bullet['y'])
                 if hit_bunker:
+                    if settings.sfx_enabled :
+                        mixer.Sound(r'resources\sounds\explosion.wav').play()
+                    hit_bunker['health'] -= 1
                     player_bullets.remove(bullet)
+                    bullet_state = True
 
             playerX += playerX_change
             playerY += playerY_change
