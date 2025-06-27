@@ -1,4 +1,6 @@
 import pygame
+import space_invader
+import settings
 
 pygame.init()
 
@@ -16,27 +18,14 @@ pygame.mixer.music.set_volume(0.3)  #
 pygame.mixer.music.play(-1)  
 
 isPaused = False
-isPlaying = True
 
 def toggle_mute():
     if pygame.mixer.music.get_busy():
         pygame.mixer.music.pause()
-        isPlaying = False
+        settings.music_enabled = False
     else:
         pygame.mixer.music.unpause()
-        isPlaying = True
-
-# def pause_music():
-#     global isPlaying
-#     if isPlaying:
-#         pygame.mixer.music.pause()
-#         isPlaying = False
-
-# def unpause_music():
-#     global isPlaying
-#     if not isPlaying:
-#         pygame.mixer.music.unpause()
-#         isPlaying = True
+        settings.music_enabled = True
 
 def main_menu():
     while True:
@@ -59,12 +48,8 @@ def main_menu():
 
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_p: 
-                        pausesound = pygame.mixer.Sound(r'resources/sounds/pause.wav').play()
+                        pygame.mixer.Sound(r'resources/sounds/pause.wav').play()
                         isPaused = not isPaused
-                        # if isPlaying:
-                        #     pause_music()
-                        # else:
-                        #     unpause_music()
 
                     elif event.key == pygame.K_m:
                         toggle_mute()
@@ -112,24 +97,18 @@ def main_menu():
                 exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_m:
-                    if isPlaying:
-                        toggle_mute()
+                    toggle_mute()
                 if event.key == pygame.K_p: 
-                        pausesound = pygame.mixer.Sound(r'resources/sounds/pause.wav').play()
+                        pygame.mixer.Sound(r'resources/sounds/pause.wav').play()
                         isPaused = not isPaused
-                        # if isPlaying:
-                        #     pause_music()
-                        # else:
-                        #     unpause_music()
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     exit()
                  
                 if event.key == pygame.K_RETURN:
+                    space_invader.main_game()
                     return 
 
         pygame.display.update()
 
-if __name__ == "__main__":
-    main_menu()
-    import space_invader    
+main_menu()

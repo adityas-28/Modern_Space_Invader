@@ -3,6 +3,7 @@ def main_boss_fight():
     from pygame import mixer
     import time 
     import math
+    import settings
 
     pygame.init()
 
@@ -52,14 +53,10 @@ def main_boss_fight():
     player_bullets = []
 
     def toggle_mute():
-        global music_enabled
         if pygame.mixer.music.get_busy():
             pygame.mixer.music.pause()
-            music_enabled = False
         else:
             pygame.mixer.music.unpause()
-            music_enabled = True
-
 
     def boss_fire_bullets(x, y, vx=0, vy=5):
         enemy_bullets.append({'x': x, 'y': y, 'vx': vx, 'vy': vy})
@@ -455,12 +452,12 @@ def main_boss_fight():
 
     player_blink = False
     player_blink_start_time = 0
-    player_invincible_duration = 1000  # milliseconds
+    player_invincible_duration = 1000 
     player_hits = 0
     playerSpeed = 7
     bossSpeed = 2
-    boss_x_dir = 1 # right
-    boss_y_dir = 1 # down
+    boss_x_dir = 1 
+    boss_y_dir = 1 
     last_shot_time = None
     player_last_shot_time = None
     player_bullet_delay = 700
@@ -468,12 +465,12 @@ def main_boss_fight():
     boss_burst_shots_fired = 0
     boss_last_shot_time = 0
     boss_burst_count = 55
-    boss_burst_delay = 7  # time between each burst shot in milliseconds
+    boss_burst_delay = 7 
     boss_vulnerable_hit = False
     boss_hit_time = 0
     pt = None
     maxVulnerableDuration = 3500
-    sfx_enabled = True
+    settings.sfx_enabled = True
     isPaused = False
     pause_start_time = None
     pause_time = 0
@@ -540,17 +537,17 @@ def main_boss_fight():
                     mixer.Sound(r'resources/sounds/pause.wav').play()
                     # toggle_mute()
                 if event.key == pygame.K_s:
-                    sfx_enabled = not sfx_enabled
+                    settings.sfx_enabled = not settings.sfx_enabled
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     exit()
                 if event.key == pygame.K_SPACE:
-                    if sfx_enabled:
+                    if settings.sfx_enabled:
                         mixer.Sound(r'resources\sounds\laser2.wav').play()
                     if curr_time - player_last_shot_time > player_bullet_delay:
                         dx = boss_x - playerX
                         dy = boss_y - playerY
-                        angle = math.degrees(math.atan2(-dy, dx))  # same as used for rotating the player
+                        angle = math.degrees(math.atan2(-dy, dx)) 
 
                         player_center_x = playerX + playerImage.get_width() // 2
                         player_center_y = playerY + playerImage.get_height() // 2
@@ -627,10 +624,10 @@ def main_boss_fight():
         # Boss attack pattern logic
         if boss_phase == "burst":
             if boss_burst_shots_fired < boss_burst_count:
-                if boss_burst_shots_fired == 0 and sfx_enabled:
+                if boss_burst_shots_fired == 0 and settings.sfx_enabled:
                     mixer.Sound(r'resources\sounds\bossLaser.mp3').play()
 
-                # Spiral / radial bullet pattern
+                # Spiral radial bullet pattern
                 if curr_time - boss_last_shot_time > boss_burst_delay:
                     bullets_per_shot = 5 # Increase for denser spiral
                     spiral_speed = 10    # Adjust bullet speed
@@ -651,27 +648,26 @@ def main_boss_fight():
             else:
                 boss_phase = "vulnerable"
                 boss_burst_shots_fired = 0
-                pt = curr_time  # <-- Set PT correctly when entering vulnerable state
+                pt = curr_time  
                 boss_vulnerable_hit = False
 
 
         elif boss_phase == "vulnerable":
-        # Wait for player to hit during this phase
             if boss_vulnerable_hit:
-                if curr_time - boss_hit_time > 550:  # 550 ms delay after hit
+                if curr_time - boss_hit_time > 550: 
                     boss_phase = "burst"
                     boss_last_shot_time = curr_time
-                    boss_vulnerable_hit = False  # Reset for next time
+                    boss_vulnerable_hit = False  
 
         if boss_hits_player(boss_x, boss_y, playerX, playerY, boss_image, playerImage):
-            if not player_blink:  # optional invincibility check
+            if not player_blink: 
                 player_hits += 1
                 player_blink = True
                 player_blink_start_time = curr_time
-                if sfx_enabled:
+                if settings.sfx_enabled:
                     mixer.Sound(r'resources\sounds\explosionWarning.mp3').play()
                 if player_hits >= 5:
-                    return False  # game over or defeat
+                    return False 
 
 
         for bullet in enemy_bullets[:]:
@@ -682,7 +678,7 @@ def main_boss_fight():
 
             if player_collision(bullet, playerX - 20, playerY + 10):
                 if not player_blink:
-                    if sfx_enabled:
+                    if settings.sfx_enabled:
                         mixer.Sound(r'resources\sounds\explosionWarning.mp3').play()
                     player_hits += 1
                     player_blink = True
@@ -690,7 +686,7 @@ def main_boss_fight():
                     if player_hits == 5:
                         main_message3(victory=False)
                         return False
-                enemy_bullets.remove(bullet)  # Remove bullet whether or not it caused damage
+                enemy_bullets.remove(bullet)  
 
             if bullet['y'] > 600:
                 enemy_bullets.remove(bullet)
@@ -706,13 +702,13 @@ def main_boss_fight():
             screen.blit(rotated_bullet, bullet_rect.topleft)
 
             if boss_collision(bullet, boss_x, boss_y):
-                if sfx_enabled:
+                if settings.sfx_enabled:
                     mixer.Sound(r'resources\sounds\explosion.wav').play()
                 player_bullets.remove(bullet)
                 if boss_phase == "vulnerable" and not boss_vulnerable_hit:
                     boss_hits += 1
                     boss_vulnerable_hit = True
-                    boss_hit_time = curr_time  # Start 1-second timer after hit
+                    boss_hit_time = curr_time  
 
                 if boss_hits == 10:
                     main_message3(victory=True)
