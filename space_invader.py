@@ -4,6 +4,7 @@ def main_game():
     from pygame import mixer
     import bossFight
     import settings
+    import sys
 
     pygame.init()
 
@@ -310,7 +311,7 @@ def main_game():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    exit()
+                    sys.exit()
 
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_m:
@@ -340,7 +341,7 @@ def main_game():
                             for pause_event in pygame.event.get():
                                 if pause_event.type == pygame.QUIT:
                                     pygame.quit()
-                                    exit()
+                                    sys.exit()
                                 elif pause_event.type == pygame.KEYDOWN:
                                     if pause_event.key == pygame.K_p:
                                         pausesound = mixer.Sound(r'resources/sounds/pause.wav').play()
@@ -350,14 +351,14 @@ def main_game():
                                         toggle_mute()
                                     elif pause_event.key == pygame.K_ESCAPE:
                                         pygame.quit()
-                                        exit()
+                                        sys.exit()
                                     elif event.key == pygame.K_RETURN:
                                         pygame.mixer.music.unpause()
                                         return True
 
                     elif event.key == pygame.K_ESCAPE:
                         pygame.quit()
-                        exit()
+                        sys.exit()
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if play_again_rect.collidepoint(mouse_pos):
@@ -435,7 +436,7 @@ def main_game():
                             toggle_mute()
                         elif event.key == pygame.K_ESCAPE:
                             pygame.quit()
-                            exit()
+                            sys.exit()
                 continue
 
 
@@ -469,7 +470,7 @@ def main_game():
                         settings.sfx_enabled = not settings.sfx_enabled                     
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
-                        exit()
+                        sys.exit()
                     if event.key == pygame.K_LEFT:
                         playerX_change -= PLAYER_SPEED
                     elif event.key == pygame.K_RIGHT:
@@ -606,7 +607,7 @@ def main_game():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    exit()
+                    sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_m:
                         toggle_mute()
@@ -619,7 +620,7 @@ def main_game():
                         settings.sfx_enabled = not settings.sfx_enabled                     
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
-                        exit()
+                        sys.exit()
 
         
             restart = gameOver(True if isWon else False, score_value, maxTimeLimit - elapsed_time, noOfLives)

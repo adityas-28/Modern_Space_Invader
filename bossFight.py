@@ -4,7 +4,8 @@ def main_boss_fight():
     import time 
     import math
     import settings
-
+    import sys
+    
     pygame.init()
 
     screen = pygame.display.set_mode((800, 600))
@@ -171,7 +172,7 @@ def main_boss_fight():
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
-                        exit()
+                        sys.exit()
                     elif event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_p: 
                             mixer.Sound(r'resources/sounds/pause.wav').play()
@@ -183,7 +184,7 @@ def main_boss_fight():
                             toggle_mute()
                         elif event.key == pygame.K_ESCAPE:
                             pygame.quit()
-                            exit()
+                            sys.exit()
                 continue
 
             screen.blit(background, (0, 0))
@@ -198,7 +199,7 @@ def main_boss_fight():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    exit()
+                    sys.exit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_m:
                         toggle_mute()
@@ -207,7 +208,7 @@ def main_boss_fight():
                         isPaused = not isPaused
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
-                        exit()
+                        sys.exit()
                     elif event.key == pygame.K_RETURN:
                         if not done:
                             counter = speed * len(messages[current_message])
@@ -282,7 +283,7 @@ def main_boss_fight():
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
-                        exit()
+                        sys.exit()
                     elif event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_p: 
                             mixer.Sound(r'resources/sounds/pause.wav').play()
@@ -294,7 +295,7 @@ def main_boss_fight():
                             toggle_mute()
                         elif event.key == pygame.K_ESCAPE:
                             pygame.quit()
-                            exit()
+                            sys.exit()
                 continue
 
             screen.blit(background, (0, 0))
@@ -306,7 +307,7 @@ def main_boss_fight():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    exit()
+                    sys.exit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_m:
                         toggle_mute()
@@ -315,7 +316,7 @@ def main_boss_fight():
                         mixer.Sound(r'resources/sounds/pause.wav').play()
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
-                        exit()
+                        sys.exit()
                     elif event.key == pygame.K_RETURN:
                         if not done:
                             counter = speed * len(messages[current_message])
@@ -391,7 +392,7 @@ def main_boss_fight():
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
-                        exit()
+                        sys.exit()
 
                     elif event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_p: 
@@ -405,7 +406,7 @@ def main_boss_fight():
                             toggle_mute()
                         elif event.key == pygame.K_ESCAPE:
                             pygame.quit()
-                            exit()
+                            sys.exit()
                 continue    
 
             screen.blit(background, (0, 0))
@@ -415,7 +416,7 @@ def main_boss_fight():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    exit()
+                    sys.exit()
 
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_m:
@@ -426,7 +427,7 @@ def main_boss_fight():
                         # toggle_mute()
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
-                        exit()
+                        sys.exit()
                     elif event.key == pygame.K_RETURN:
                         if not done:
                             counter = speed * len(messages[current_message])
@@ -530,14 +531,14 @@ def main_boss_fight():
                         toggle_mute()
                     elif event.key == pygame.K_ESCAPE:
                         pygame.quit()
-                        exit()
+                        sys.exit()
             continue
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 pygame.quit()
-                exit()
+                sys.exit()
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
@@ -558,7 +559,7 @@ def main_boss_fight():
                     settings.sfx_enabled = not settings.sfx_enabled
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
-                    exit()
+                    sys.exit()
                 if event.key == pygame.K_SPACE:
                     if settings.sfx_enabled:
                         mixer.Sound(r'resources\sounds\laser2.wav').play()

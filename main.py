@@ -1,6 +1,7 @@
 import pygame
 import space_invader
 import settings
+import sys
 
 pygame.init()
 
@@ -44,7 +45,7 @@ def main_menu():
                 if event.type == pygame.QUIT:
                     running = False
                     pygame.quit()
-                    exit()
+                    sys.exit()
 
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_p: 
@@ -56,7 +57,7 @@ def main_menu():
 
                     elif event.key == pygame.K_ESCAPE:
                         pygame.quit()
-                        exit()
+                        sys.exit()
             continue
 
         screen.blit(background, (0, 0))
@@ -94,7 +95,7 @@ def main_menu():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                exit()
+                sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_m:
                     toggle_mute()
@@ -103,7 +104,7 @@ def main_menu():
                         isPaused = not isPaused
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
-                    exit()
+                    sys.exit()
                  
                 if event.key == pygame.K_RETURN:
                     space_invader.main_game()

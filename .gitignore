@@ -20,3 +20,12 @@ Thumbs.db
 
 #Ignore High score file
 highscore.txt
+
+#Ignore dist folder
+dist
+
+#Ignore build folder
+build
+
+# Ignore main.spec
+main.spec
